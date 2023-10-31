@@ -4,7 +4,7 @@ CSCI 4229 FINAL PROJECT
 By Sean Carter
 
 
-Utilizes the CSCIx229.h library by:
+Utilizes functions and basic rendering code from the CSCIx229.h library by:
 Willem A. (Vlakkies) Schreuder
 
 This code is extremely inefficient in an attempt to make it easier to read

@@ -1,10 +1,7 @@
 /*
- *  Shadow Volumes
+ *  Archipelago
  *
- *  This code is extremely inefficient in an attempt to make it easier to read
- *  It also has multiple ways of doing things - real code would do only one.
- *
- *  Use Transform to get light position in local coordinate system
+ * DESCRIPTION HERE!
  *
  *  Key bindings:
  *  m/M        Cycle through shadow volume steps (mode)
@@ -12,7 +9,6 @@
  *  +/-        Change light elevation
  *  []         Change light position
  *  s/S        Start/stop light movement
- *  l/L        Toggle teapot lid stretch
  *  <>         Decrease/increase number of slices in objects
  *  b/B        Toggle room box
  *  a          Toggle axes
@@ -22,6 +18,7 @@
  *  ESC        Exit
  */
 #include "CSCIx229.h"
+
 typedef struct {float x,y,z;} Point;
 //  Global variables
 int    mode=4;    // Display mode
@@ -50,25 +47,6 @@ const char* text[] = {"Shadowed Object","Front Shadows","Back Shadows","Lit Obje
 
 #define MAXN 64    // Maximum number of slices (n) and points in a polygon
 
-/*
- *  Define Utah teapot using Bezier patches
- *
- *  Rim, body, lid, and bottom data must be reflected in x and y;
- *  Handle and spout reflected across the y axis only.
- */
-static int teapot[][4][4] =
-{
-   {{102,103,104,105},{  4,  5,  6,  7},{  8,  9, 10, 11},{ 12, 13, 14, 15}},  //  Rim
-   {{ 12, 13, 14, 15},{ 16, 17, 18, 19},{ 20, 21, 22, 23},{ 24, 25, 26, 27}},  //  Upper body
-   {{ 24, 25, 26, 27},{ 29, 30, 31, 32},{ 33, 34, 35, 36},{ 37, 38, 39, 40}},  //  Lower body
-   {{118,118,118,118},{124,122,119,121},{123,126,125,120},{ 40, 39, 38, 37}},  //  Bottom
-   {{ 96, 96, 96, 96},{ 97, 98, 99,100},{101,101,101,101},{  0,  1,  2,  3}},  //  Lid handle
-   {{  0,  1,  2,  3},{106,107,108,109},{110,111,112,113},{114,115,116,117}},  //  Lid
-   {{ 41, 42, 43, 44},{ 45, 46, 47, 48},{ 49, 50, 51, 52},{ 53, 54, 55, 56}},  //  Upper handle
-   {{ 53, 54, 55, 56},{ 57, 58, 59, 60},{ 61, 62, 63, 64},{ 28, 65, 66, 67}},  //  Lower handle
-   {{ 68, 69, 70, 71},{ 72, 73, 74, 75},{ 76, 77, 78, 79},{ 80, 81, 82, 83}},  //  Spout body
-   {{ 80, 81, 82, 83},{ 84, 85, 86, 87},{ 88, 89, 90, 91},{ 92, 93, 94, 95}},  //  Spout tip
-};
 //  Data points
 static Point data[] =
    {
@@ -594,35 +572,6 @@ static void Patch(int patch[4][4],float Sx,float Sy,float Sz)
       }
 }
 
-/*
- *  Draw teapot
- */
-static void Teapot(float x,float y,float z , float th,float ph , float S)
-{
-   int i;
-
-   Transform(x,y,z,S,S,S,th,ph);
-   Color(0,1,0);
-   //  Draw patches
-   for (i=0;i<10;i++)
-   {
-      //  Draw patch reflected to 4 quadrants
-      if (i<6)
-      {
-         Patch(teapot[i],+1,+1,1);
-         Patch(teapot[i],+1,-1,1);
-         Patch(teapot[i],-1,+1,1);
-         Patch(teapot[i],-1,-1,1);
-      }
-      //  Draw patch reflected to 2 hemispheres
-      else
-      {
-         Patch(teapot[i],+1,+1,1);
-         Patch(teapot[i],+1,-1,1);
-      }
-   }
-   glPopMatrix();
-}
 
 /*
  *  Draw a wall
@@ -696,7 +645,6 @@ void Scene(int Light)
    if (obj&0x01)     Cube(-0.8,+0.8,0.0 , -0.25*zh, 0  , 0.3    );
    if (obj&0x02) Cylinder(+0.8,+0.5,0.0 ,   0.5*zh,zh  , 0.2,0.5);
    if (obj&0x04)    Torus(+0.5,-0.8,0.0 ,        0,zh  , 0.5,0.2);
-   if (obj&0x08)   Teapot(-0.5,-0.5,0.0 ,     2*zh, 0  , 0.25   );
 
    //  Disable textures
    if (light) glDisable(GL_TEXTURE_2D);
@@ -892,9 +840,9 @@ void display()
    }
 
    //  Display parameters
-   glWindowPos2i(5,5);
-   Print("Ylight=%.1f Angle=%d,%d,%d  Dim=%.1f Slices=%d Mode=%s Inf=%s Stencil=%d",
-     Ylight,th,ph,zh,dim,n,text[mode],inf?"Fixed":"Calculated",depth);
+   // glWindowPos2i(5,5);
+   // Print("Ylight=%.1f Angle=%d,%d,%d  Dim=%.1f Slices=%d Mode=%s Inf=%s Stencil=%d",
+   //   Ylight,th,ph,zh,dim,n,text[mode],inf?"Fixed":"Calculated",depth);
 
    //  Render the scene and make it visible
    ErrCheck("display");
@@ -1033,10 +981,11 @@ int main(int argc,char* argv[])
 {
    //  Initialize GLUT
    glutInit(&argc,argv);
+
    //  Request double buffered, true color window with Z buffering & stencil at 600x600
    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE | GLUT_STENCIL);
    glutInitWindowSize(600,600);
-   glutCreateWindow("Shadow Volumes");
+   glutCreateWindow("Archipelago");
 #ifdef USEGLEW
    //  Initialize GLEW
    if (glewInit()!=GLEW_OK) Fatal("Error initializing GLEW\n");
