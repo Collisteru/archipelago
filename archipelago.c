@@ -34,7 +34,7 @@ double asp=1;     // Aspect ratio
 
 int    zh=0;      // Light azimuth
 float  Ylight=2;  // Elevation of light
-int    light;     // Light mode: true=draw polygon, false=draw shadow volume
+int    light = 0;     // Light mode: true=draw polygon, false=draw shadow volume
 
 // Global Variables (declared in archlib.c)
 int mode = 0;
@@ -49,96 +49,6 @@ const char* text[] = {"Shadowed Object","Front Shadows","Back Shadows","Lit Obje
 #define MAXN 64    // Maximum number of slices (n) and points in a polygon
 
 
-/*
- *  Calculate shadow location
- */
-Point Shadow(Point P)
-{
-   double lambda;
-   Point  S;
-
-   //  Fixed lambda
-   if (inf)
-      lambda = 1024;
-   //  Calculate lambda for clipping plane
-   else
-   {
-      // lambda = (E-L).N / (P-L).N = (E.N - L.N) / (P.N - L.N)
-      double LN = Lp.x*Nc.x+Lp.y*Nc.y + Lp.z*Nc.z;
-      double PLN = P.x*Nc.x+P.y*Nc.y+P.z*Nc.z - LN;
-      lambda = (fabs(PLN)>1e-10) ? (Ec.x*Nc.x+Ec.y*Nc.y+Ec.z*Nc.z - LN)/PLN : 1024;
-      //  If lambda<0, then the plane is behind the light
-      //  If lambda [0,1] the plane is between the light and the object
-      //  So make lambda big if this is true
-      if (lambda<=1) lambda = 1024;
-   }
-
-   //  Calculate shadow location
-   S.x = lambda*(P.x-Lp.x) + Lp.x;
-   S.y = lambda*(P.y-Lp.y) + Lp.y;
-   S.z = lambda*(P.z-Lp.z) + Lp.z;
-   return S;
-}
-
-/*
- *  Draw polygon or shadow volume
- *    P[] array of vertexes making up the polygon
- *    N[] array of normals (not used with shadows)
- *    T[] array of texture coordinates (not used with shadows)
- *    n   number of vertexes
- *  Killer fact: the order of points MUST be CCW
- */
-void DrawPolyShadow(Point P[],Point N[],Point T[],int n)
-{
-   //  Draw polygon with normals and textures
-   if (light)
-   {
-      glBegin(GL_POLYGON);
-      for (int k=0;k<n;k++)
-      {
-         glNormal3f(N[k].x,N[k].y,N[k].z);
-         glTexCoord2f(T[k].x,T[k].y);
-         glVertex3f(P[k].x,P[k].y,P[k].z);
-      }
-      glEnd();
-   }
-   //  Draw shadow volume
-   else
-   {
-      //  Check if polygon is visible
-      int vis = 0;
-      for (int k=0;k<n;k++)
-         vis = vis | (N[k].x*(Lp.x-P[k].x) + N[k].y*(Lp.y-P[k].y) + N[k].z*(Lp.z-P[k].z) >= 0);
-      //  Draw shadow volume only for those polygons facing the light
-      if (vis)
-      {
-         //  Shadow coordinates (at infinity)
-         Point S[MAXN];
-         if (n>MAXN) Fatal("Too many points in polygon %d\n",n);
-         //  Project shadow
-         for (int k=0;k<n;k++)
-            S[k] = Shadow(P[k]);
-         //  Front face
-         glBegin(GL_POLYGON);
-         for (int k=0;k<n;k++)
-            glVertex3f(P[k].x,P[k].y,P[k].z);
-         glEnd();
-         //  Back face
-         glBegin(GL_POLYGON);
-         for (int k=n-1;k>=0;k--)
-            glVertex3f(S[k].x,S[k].y,S[k].z);
-         glEnd();
-         //  Sides
-         glBegin(GL_QUAD_STRIP);
-         for (int k=0;k<=n;k++)
-         {
-            glVertex3f(P[k%n].x,P[k%n].y,P[k%n].z);
-            glVertex3f(S[k%n].x,S[k%n].y,S[k%n].z);
-         }
-         glEnd();
-      }
-   }
-}
 
 /*
  *  Evaluate 2D Bezier surface
@@ -220,41 +130,7 @@ Point Normal2D(Point p[4][4],float u,float v)
 }
 
 
-// /*
-//  *  Backsolve LU decomposition
-//  *     M  4x4 matrix
-//  *     I  Pivot index
-//  *     Bx,By,Bz,Bw is RHS
-//  *     Returns renormalized Point
-//  */
-// Point Backsolve(double M[16],int I[4],double Bx,double By,double Bz,double Bw)
-// {
-//    int    i,j;                  //  Counters
-//    double x[4];                 //  Solution vector
-//    Point  X;                    //  Solution Point
-//    double b[4] = {Bx,By,Bz,Bw}; //  RHS
 
-//    //  Backsolve
-//    for (i=0;i<4;i++)
-//    {
-//       x[i] = b[I[i]];
-//       for (j=0;j<i;j++)
-//          x[i] -= M(i,j)*x[j];
-//    }
-//    for (i=3;i>=0;i--)
-//    {
-//       for (j=i+1;j<4;j++)
-//          x[i] -= M(i,j)*x[j];
-//       x[i] /= M(i,i);
-//    }
-
-//    //  Renormalize
-//    if (fabs(x[3])<1e-10) Fatal("Light position W is zero\n");
-//    X.x = x[0]/x[3];
-//    X.y = x[1]/x[3];
-//    X.z = x[2]/x[3];
-//    return X;
-// }
 
 /*
  *  Enable lighting
@@ -263,8 +139,10 @@ static void Light(int on)
 {
    if (on)
    {
-      float Ambient[]   = {0.3,0.3,0.3,1.0};
-      float Diffuse[]   = {1,1,1,1};
+      float Ambient[]   = {1.0,1.0,1.0,1.0};
+      float Diffuse[]   = {3.0,3.0,3.0,1.0};
+      float Emission[] = {1.0,1.0,1.0,1.0};
+
       //  Enable lighting with normalization
       glEnable(GL_LIGHTING);
       glEnable(GL_NORMALIZE);
@@ -273,9 +151,11 @@ static void Light(int on)
       glEnable(GL_COLOR_MATERIAL);
       //  Enable light 0
       glEnable(GL_LIGHT0);
+      // glLightfv(GL_LIGHT0, GL_EMISSION, Ambient); TODO: Fix this!
       glLightfv(GL_LIGHT0,GL_AMBIENT ,Ambient);
       glLightfv(GL_LIGHT0,GL_DIFFUSE ,Diffuse);
       glLightfv(GL_LIGHT0,GL_POSITION,Lpos);
+      
    }
    else
       glDisable(GL_LIGHTING);
@@ -329,16 +209,16 @@ void Scene(int Light)
 }
 
 /*
- *  Draw scene using shadow volumes
+ *  Draw scene
  */
-static void DrawSceneWithShadows()
+static void DrawScene()
 {
-   //  PASS 1:
-   //  Draw whole scene as shadowed
-   //  Lighting is still off
-   //  The color should be what the object looks like when in the shadow
-   //  This sets the object depths in the Z-buffer
-   Scene(-1);
+   
+   //  Enable lighting
+   //  Render the parts of objects not in shadows
+   //  (The mode test is for demonstrating unlit objects only)
+   Light(1);
+   Scene(1);
 
    //  Make color buffer and Z buffer read-only
    glColorMask(0,0,0,0);
@@ -351,70 +231,7 @@ static void DrawSceneWithShadows()
    //  Enable face culling
    glEnable(GL_CULL_FACE);
 
-   //  This switch is for demonstration purposes only
-   //  Normally you would pick just one method (mode=4 or mode=5)
-   //  Modes 0 to 3 are for demonstration purposes
-   //  which do not result in correctly rendered shadows
-   switch (mode)
-   {
-      //  Shadowed objects only - do nothing
-      case 0:
-         break;
-      //  Front shadows
-      //  This is for demonstation purposes only
-      case 1:
-         glFrontFace(GL_CCW);
-         glStencilOp(GL_KEEP,GL_KEEP,GL_INCR);
-         Scene(0);
-         break;
-      //  Back shadows
-      //  This is for demonstation purposes only
-      case 2:
-         glFrontFace(GL_CW);
-         glStencilOp(GL_KEEP,GL_KEEP,GL_INCR);
-         Scene(0);
-         break;
-      //  Lit parts of objects only (do Z-pass to help find this)
-      case 3:
-      //  Z-pass variation
-      //  Count from the eye to the object
-      case 4:
-         //  PASS 2:
-         //  Draw only the front faces of the shadow volume
-         //  Increment the stencil value on Z pass
-         //  Depth and color buffers unchanged
-         glFrontFace(GL_CCW);
-         glStencilOp(GL_KEEP,GL_KEEP,GL_INCR);
-         Scene(0);
-         //  PASS 3:
-         //  Draw only the back faces of the shadow volume
-         //  Decrement the stencil value on Z pass
-         //  Depth and color buffers unchanged
-         glFrontFace(GL_CW);
-         glStencilOp(GL_KEEP,GL_KEEP,GL_DECR);
-         Scene(0);
-         break;
-      //  Z-fail variation
-      //  Count from the object to infinity
-      case 5:
-         //  PASS 2:
-         //  Draw only the back faces of the shadow volume
-         //  Increment the stencil value on Z fail
-         //  Depth and color buffers unchanged
-         glFrontFace(GL_CW);
-         glStencilOp(GL_KEEP,GL_INCR,GL_KEEP);
-         Scene(0);
-         //  PASS 3:
-         //  Draw only the front faces of the shadow volume
-         //  Decrement the stencil value on Z fail
-         //  Depth and color buffers unchanged
-         glFrontFace(GL_CCW);
-         glStencilOp(GL_KEEP,GL_DECR,GL_KEEP);
-         Scene(0);
-         break;
-      default:
-         break;
-   }
+
 
    //  Disable face culling
    glDisable(GL_CULL_FACE);
@@ -426,13 +243,6 @@ static void DrawSceneWithShadows()
    glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
    //  Redraw only if depth matches front object
    glDepthFunc(GL_EQUAL);
-
-   //  PASS 4:
-   //  Enable lighting
-   //  Render the parts of objects not in shadows
-   //  (The mode test is for demonstrating unlit objects only)
-   Light(1);
-   if (mode) Scene(1);
 
    //  Undo changes (no stencil test, draw if closer and update Z-buffer)
    glDisable(GL_STENCIL_TEST);
@@ -451,6 +261,7 @@ void display()
    float Ex = -2*dim*Sin(th)*Cos(ph);
    float Ey = +2*dim        *Sin(ph);
    float Ez = +2*dim*Cos(th)*Cos(ph);
+
    //  Light position
    Lpos[0] = 2*Cos(zh);
    Lpos[1] = Ylight;
@@ -473,8 +284,8 @@ void display()
    glutSolidSphere(0.03,10,10);
    glPopMatrix();
 
-   //  Draw the scene with shadows
-   DrawSceneWithShadows();
+   //  Draw the scene
+   DrawScene(1);
 
    //  Draw axes (white)
    glColor3f(1,1,1);
@@ -624,9 +435,6 @@ int main(int argc,char* argv[])
 {
    // Initialize Global Variables:
    // Globals taken from header file
-   
-
-
 
    //  Initialize GLUT
    glutInit(&argc,argv);
@@ -639,19 +447,23 @@ int main(int argc,char* argv[])
    //  Initialize GLEW
    if (glewInit()!=GLEW_OK) Fatal("Error initializing GLEW\n");
 #endif
+
    //  Set callbacks
    glutDisplayFunc(display);
    glutReshapeFunc(reshape);
    glutSpecialFunc(special);
    glutKeyboardFunc(key);
    glutIdleFunc(move?idle:NULL);
+
    //  Check stencil depth
    glGetIntegerv(GL_STENCIL_BITS,&depth);
    if (depth<=0) Fatal("No stencil buffer\n");
+
    //  Load textures
    tex2d[0] = LoadTexBMP("water.bmp");
    tex2d[1] = LoadTexBMP("crate.bmp");
    tex2d[2] = LoadTexBMP("pi.bmp");
+
    //  Pass control to GLUT so it can interact with the user
    ErrCheck("init");
    glutMainLoop();
