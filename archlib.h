@@ -1,5 +1,5 @@
-#ifndef CSCIx229
-#define CSCIx229
+#ifndef archlib
+#define archlib
 
 #include <stdio.h>
 #include <stdlib.h>

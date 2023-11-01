@@ -1,6 +1,6 @@
 //  CSCIx239 library
 //  Willem A. (Vlakkies) Schreuder
-#include "CSCIx229.h"
+#include "archlib.h"
 
 //
 //  Check for OpenGL errors and print to stderr

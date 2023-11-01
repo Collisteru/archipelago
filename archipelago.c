@@ -17,7 +17,7 @@
  *  0          Reset view angle
  *  ESC        Exit
  */
-#include "CSCIx229.h"
+#include "archlib.h"
 
 typedef struct {float x,y,z;} Point;
 //  Global variables
@@ -47,42 +47,7 @@ const char* text[] = {"Shadowed Object","Front Shadows","Back Shadows","Lit Obje
 
 #define MAXN 64    // Maximum number of slices (n) and points in a polygon
 
-//  Data points
-static Point data[] =
-   {
-   { 0.2   ,  0     , 2.7    }, { 0.2   , -0.112 , 2.7    }, { 0.112 , -0.2   , 2.7    }, { 0     , -0.2   , 2.7    },
-   { 1.3375,  0     , 2.53125}, { 1.3375, -0.749 , 2.53125}, { 0.749 , -1.3375, 2.53125}, { 0     , -1.3375, 2.53125},
-   { 1.4375,  0     , 2.53125}, { 1.4375, -0.805 , 2.53125}, { 0.805 , -1.4375, 2.53125}, { 0     , -1.4375, 2.53125},
-   { 1.5   ,  0     , 2.4    }, { 1.5   , -0.84  , 2.4    }, { 0.84  , -1.5   , 2.4    }, { 0     , -1.5   , 2.4    },
-   { 1.75  ,  0     , 1.875  }, { 1.75  , -0.98  , 1.875  }, { 0.98  , -1.75  , 1.875  }, { 0     , -1.75  , 1.875  },
-   { 2     ,  0     , 1.35   }, { 2     , -1.12  , 1.35   }, { 1.12  , -2     , 1.35   }, { 0     , -2     , 1.35   },
-   { 2     ,  0     , 0.9    }, { 2     , -1.12  , 0.9    }, { 1.12  , -2     , 0.9    }, { 0     , -2     , 0.9    },
-   { -2    ,  0     , 0.9    }, { 2     ,  0     , 0.45   }, { 2     , -1.12  , 0.45   }, { 1.12  , -2     , 0.45   },
-   { 0     , -2     , 0.45   }, { 1.5   ,  0     , 0.225  }, { 1.5   , -0.84  , 0.225  }, { 0.84  , -1.5   , 0.225  },
-   { 0     , -1.5   , 0.225  }, { 1.5   ,  0     , 0.15   }, { 1.5   , -0.84  , 0.15   }, { 0.84  , -1.5   , 0.15   },
-   { 0     , -1.5   , 0.15   }, {-1.6   ,  0     , 2.025  }, {-1.6   , -0.3   , 2.025  }, {-1.5   , -0.3   , 2.25   },
-   {-1.5   ,  0     , 2.25   }, {-2.3   ,  0     , 2.025  }, {-2.3   , -0.3   , 2.025  }, {-2.5   , -0.3   , 2.25   },
-   {-2.5   ,  0     , 2.25   }, {-2.7   ,  0     , 2.025  }, {-2.7   , -0.3   , 2.025  }, {-3     , -0.3   , 2.25   },
-   {-3     ,  0     , 2.25   }, {-2.7   ,  0     , 1.8    }, {-2.7   , -0.3   , 1.8    }, {-3     , -0.3   , 1.8    },
-   {-3     ,  0     , 1.8    }, {-2.7   ,  0     , 1.575  }, {-2.7   , -0.3   , 1.575  }, {-3     , -0.3   , 1.35   },
-   {-3     ,  0     , 1.35   }, {-2.5   ,  0     , 1.125  }, {-2.5   , -0.3   , 1.125  }, {-2.65  , -0.3   , 0.9375 },
-   {-2.65  ,  0     , 0.9375 }, {-2     , -0.3   , 0.9    }, {-1.9   , -0.3   , 0.6    }, {-1.9   ,  0     , 0.6    },
-   { 1.7   ,  0     , 1.425  }, { 1.7   , -0.66  , 1.425  }, { 1.7   , -0.66  , 0.6    }, { 1.7   ,  0     , 0.6    },
-   { 2.6   ,  0     , 1.425  }, { 2.6   , -0.66  , 1.425  }, { 3.1   , -0.66  , 0.825  }, { 3.1   ,  0     , 0.825  },
-   { 2.3   ,  0     , 2.1    }, { 2.3   , -0.25  , 2.1    }, { 2.4   , -0.25  , 2.025  }, { 2.4   ,  0     , 2.025  },
-   { 2.7   ,  0     , 2.4    }, { 2.7   , -0.25  , 2.4    }, { 3.3   , -0.25  , 2.4    }, { 3.3   ,  0     , 2.4    },
-   { 2.8   ,  0     , 2.475  }, { 2.8   , -0.25  , 2.475  }, { 3.525 , -0.25  , 2.49375}, { 3.525 ,  0     , 2.49375},
-   { 2.9   ,  0     , 2.475  }, { 2.9   , -0.15  , 2.475  }, { 3.45  , -0.15  , 2.5125 }, { 3.45  ,  0     , 2.5125 },
-   { 2.8   ,  0     , 2.4    }, { 2.8   , -0.15  , 2.4    }, { 3.2   , -0.15  , 2.4    }, { 3.2   ,  0     , 2.4    },
-   { 0     ,  0     , 3.15   }, { 0.8   ,  0     , 3.15   }, { 0.8   , -0.45  , 3.15   }, { 0.45  , -0.8   , 3.15   },
-   { 0     , -0.8   , 3.15   }, { 0     ,  0     , 2.85   }, { 1.4   ,  0     , 2.4    }, { 1.4   , -0.784 , 2.4    },
-   { 0.784 , -1.4   , 2.4    }, { 0     , -1.4   , 2.4    }, { 0.4   ,  0     , 2.55   }, { 0.4   , -0.224 , 2.55   },
-   { 0.224 , -0.4   , 2.55   }, { 0     , -0.4   , 2.55   }, { 1.3   ,  0     , 2.55   }, { 1.3   , -0.728 , 2.55   },
-   { 0.728 , -1.3   , 2.55   }, { 0     , -1.3   , 2.55   }, { 1.3   ,  0     , 2.4    }, { 1.3   , -0.728 , 2.4    },
-   { 0.728 , -1.3   , 2.4    }, { 0     , -1.3   , 2.4    }, { 0     ,  0     , 0      }, { 1.425 , -0.798 , 0      },
-   { 1.5   ,  0     , 0.075  }, { 1.425 ,  0     , 0      }, { 0.798 , -1.425 , 0      }, { 0     , -1.5   , 0.075  },
-   { 0     , -1.425 , 0      }, { 1.5   , -0.84  , 0.075  }, { 0.84  , -1.5   , 0.075  },
-   };
+
 
 /*
  *  Set color with shadows
@@ -130,6 +95,27 @@ Point Shadow(Point P)
    S.y = lambda*(P.y-Lp.y) + Lp.y;
    S.z = lambda*(P.z-Lp.z) + Lp.z;
    return S;
+}
+
+/*
+ *  Draw polygon or shadow volume
+ *    P[] array of vertexes making up the polygon
+ *    N[] array of normals (not used with shadows)
+ *    T[] array of texture coordinates (not used with shadows)
+ *    n   number of vertexes
+ *  Killer fact: the order of points MUST be CCW
+ */
+void DrawPoly(Point P[],Point N[],Point T[],int n)
+{
+   //  Draw polygon with normals and textures
+   glBegin(GL_POLYGON);
+   for (int k=0;k<n;k++)
+   {
+      glNormal3f(N[k].x,N[k].y,N[k].z);
+      glTexCoord2f(T[k].x,T[k].y);
+      glVertex3f(P[k].x,P[k].y,P[k].z);
+   }
+   glEnd();
 }
 
 /*
@@ -437,12 +423,12 @@ static void Cube(float x,float y,float z , float th,float ph , float D)
    Point T[] = { {0,0,0} , {1,0,0} , {1,1,0} , {0,1,0} };
 
    Transform(x,y,z,D,D,D,th,ph);
-   Color(1,0,0); DrawPolyShadow(P1,N1,T,4); //  Front
-   Color(0,0,1); DrawPolyShadow(P2,N2,T,4); //  Back
-   Color(1,1,0); DrawPolyShadow(P3,N3,T,4); //  Right
-   Color(0,1,0); DrawPolyShadow(P4,N4,T,4); //  Left
-   Color(0,1,1); DrawPolyShadow(P5,N5,T,4); //  Top
-   Color(1,0,1); DrawPolyShadow(P6,N6,T,4); //  Bottom
+   Color(1,0,0); DrawPoly(P1,N1,T,4); //  Front
+   Color(0,0,1); DrawPoly(P2,N2,T,4); //  Back
+   Color(1,1,0); DrawPoly(P3,N3,T,4); //  Right
+   Color(0,1,0); DrawPoly(P4,N4,T,4); //  Left
+   Color(0,1,1); DrawPoly(P5,N5,T,4); //  Top
+   Color(1,0,1); DrawPoly(P6,N6,T,4); //  Bottom
    glPopMatrix();
 }
 
@@ -465,7 +451,7 @@ static void Cylinder(float x,float y,float z , float th,float ph , float R,float
          Point P[3] = { {0,0,j} , {Cos(th0),Sin(th0),j} , {Cos(th1),Sin(th1),j} };
          Point N[3] = { {0,0,j} , {       0,       0,j} , {       0,       0,j} };
          Point T[3] = { {0,0,0} , {Cos(th0),Sin(th0),0} , {Cos(th1),Sin(th1),0} };
-         DrawPolyShadow(P,N,T,3);
+         DrawPoly(P,N,T,3);
       }
    //  Cylinder Body (strip of quads)
    for (i=0;i<N;i++)
@@ -475,7 +461,7 @@ static void Cylinder(float x,float y,float z , float th,float ph , float R,float
       Point P[4] = { {Cos(th0),Sin(th0),+1} , {Cos(th0),Sin(th0),-1} , {Cos(th1),Sin(th1),-1} , {Cos(th1),Sin(th1),+1} };
       Point N[4] = { {Cos(th0),Sin(th0), 0} , {Cos(th0),Sin(th0), 0} , {Cos(th1),Sin(th1), 0} , {Cos(th1),Sin(th1), 0} };
       Point T[4] = { {       0,th0/90.0, 0} , {       2,th0/90.0, 0} , {       2,th1/90.0, 0} , {       0,th1/90.0, 0} };
-      DrawPolyShadow(P,N,T,4);
+      DrawPoly(P,N,T,4);
    }
 
    glPopMatrix();
@@ -513,90 +499,13 @@ static void Torus(float x,float y,float z , float th,float ph , float S,float r)
                         {th0/30.0 , ph0/180.0 , 0} ,
                         {th0/30.0 , ph1/180.0 , 0} ,
                         {th1/30.0 , ph1/180.0 , 0} };
-         DrawPolyShadow(P,N,T,4);
+         DrawPoly(P,N,T,4);
       }
    }
    glPopMatrix();
 }
 
-/*
- *  Draw patch
- *
- *  patch = set of point numbers
- *  Sx = x reflection (+/-1)
- *  Sy = y reflection (+/-1)
- *  Sz = z reflection (+/-1)
- */
-static void Patch(int patch[4][4],float Sx,float Sy,float Sz)
-{
-   int   i,j,k;
-   Point p[4][4],P[MAXN+1][MAXN+1],N[MAXN+1][MAXN+1],T[MAXN+1][MAXN+1];
 
-   //  Copy data with reflection
-   for (k=0;k<4;k++)
-   {
-      int K = Sx*Sy*Sz<0 ? 3-k : k;
-      for (j=0;j<4;j++)
-      {
-         int l = patch[j][K];
-         p[j][k].x = +Sx*data[l].x;
-         p[j][k].z = -Sy*data[l].y;
-         p[j][k].y = +Sz*data[l].z;
-      }
-   }
-
-   //  Evaluate vertexes
-   for (i=0;i<=n;i++)
-      for (j=0;j<=n;j++)
-      {
-         float u = (float)i/n;
-         float v = (float)j/n;
-         //  Vertex coordinates
-         P[i][j] = Bezier2D(p,u,v);
-         //  Normal
-         N[i][j] = Normal2D(p,u,v);
-         //  Texture coordinates
-         T[i][j].x = 1-u;
-         T[i][j].y = 1-v;
-         T[i][j].z = 0;
-      }
-
-   //  Draw quads
-   for (i=0;i<n;i++)
-      for (j=0;j<n;j++)
-      {
-         Point p[4] = {P[i][j],P[i+1][j],P[i+1][j+1],P[i][j+1]};
-         Point n[4] = {N[i][j],N[i+1][j],N[i+1][j+1],N[i][j+1]};
-         Point t[4] = {T[i][j],T[i+1][j],T[i+1][j+1],T[i][j+1]};
-         DrawPolyShadow(p,n,t,4);
-      }
-}
-
-
-/*
- *  Draw a wall
- */
-static void Wall(float x,float y,float z, float th,float ph , float Sx,float Sy,float Sz , float St)
-{
-   int   i,j;
-   float s=1.0/n;
-   float t=0.5*St/n;
-   Transform(x,y,z,Sx,Sy,Sz,th,ph);
-
-   glNormal3f(0,0,1);
-   for (j=-n;j<n;j++)
-   {
-      glBegin(GL_QUAD_STRIP);
-      for (i=-n;i<=n;i++)
-      {
-         glTexCoord2f((i+n)*t,(j  +n)*t); glVertex3f(i*s,    j*s,-1);
-         glTexCoord2f((i+n)*t,(j+1+n)*t); glVertex3f(i*s,(j+1)*s,-1);
-      }
-      glEnd();
-   }
-
-   glPopMatrix();
-}
 
 /*
  *  Enable lighting
@@ -659,11 +568,12 @@ void Scene(int Light)
    //  Water texture for floor and ceiling
    glBindTexture(GL_TEXTURE_2D,tex2d[0]);
    for (k=-1;k<=box;k+=2)
-      Wall(0,0,0, 0,90*k , 8,8,box?6:2 , 4);
+      // Wall(0,0,0, 0,90*k , 8,8,box?6:2 , 4);
+
    //  Crate texture for walls
    glBindTexture(GL_TEXTURE_2D,tex2d[1]);
    for (k=0;k<4*box;k++)
-      Wall(0,0,0, 90*k,0 , 8,box?6:2,8 , 1);
+      // Wall(0,0,0, 90*k,0 , 8,box?6:2,8 , 1);
 
    //  Disable textures
    glDisable(GL_TEXTURE_2D);
@@ -942,17 +852,6 @@ void key(unsigned char ch,int x,int y)
       n--;
    else if (ch=='>' && n<MAXN)
       n++;
-   //  Toggle lid stretch
-   else if (ch == 'l')
-   {
-      float s = size ? 1/1.12 : 1.12;
-      size = 1-size;
-      for (int k=110;k<118;k++)
-      {
-         data[k].x *= s;
-         data[k].y *= s;
-      }
-   }
    //  Set idle function
    glutIdleFunc(move?idle:NULL);
    //  Reproject

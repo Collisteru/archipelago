@@ -1,6 +1,6 @@
 //  CSCIx239 library
 //  Willem A. (Vlakkies) Schreuder
-#include "CSCIx229.h"
+#include "archlib.h"
 
 //
 //  Convenience routine to output raster text

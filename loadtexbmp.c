@@ -1,6 +1,6 @@
 //  CSCIx229 library
 //  Willem A. (Vlakkies) Schreuder
-#include "CSCIx229.h"
+#include "archlib.h"
 
 //
 //  Load texture from BMP file
