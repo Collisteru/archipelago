@@ -51,12 +51,39 @@
 extern "C" {
 #endif
 
+
+
+
+// Helper Functions
 void Print(const char* format , ...);
 void Fatal(const char* format , ...);
 unsigned int LoadTexBMP(const char* file);
 void Project(double fov,double asp,double dim);
 void ErrCheck(const char* where);
 int  LoadOBJ(const char* file);
+
+
+// Shapes
+typedef struct {float x,y,z;} Point;
+void Cube(float x,float y,float z , float th,float ph , float D);
+void Cylinder(float x,float y,float z , float th,float ph , float R,float H);
+void Torus(float x,float y,float z , float th,float ph , float S,float r);
+
+// Drawing Functions
+void DrawPoly(Point P[],Point N[],Point T[],int n);
+void Crout(double M[16],int I[4]);
+void Transform(float x0,float y0,float z0, float Sx,float Sy,float Sz, float th,float ph);
+void Color(float R,float G,float B);
+
+// Global Variables Required by Files Outside archipelago.c
+extern Point  Lp;        // Light position in local coordinate system
+extern Point  Nc,Ec;     // Far or near clipping plane in local coordinate system
+
+extern float  Lpos[4];   // Light position
+extern int    mode;    // Display mode
+extern int dim;     // Size of world
+
+
 
 #ifdef __cplusplus
 }

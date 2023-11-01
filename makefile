@@ -24,7 +24,7 @@ endif
 CLEAN=rm -f $(EXE) *.o *.a
 endif
 
-# Dependencies
+# Dependencies -- Utility Functions
 archipelago.o: archipelago.c archlib.h
 fatal.o: fatal.c archlib.h
 errcheck.o: errcheck.c archlib.h
@@ -33,8 +33,15 @@ loadtexbmp.o: loadtexbmp.c archlib.h
 loadobj.o: loadobj.c archlib.h
 projection.o: projection.c archlib.h
 
+transform.o: transform.c archlib.h
+
+# Dependencies -- Objects
+cube.o: cube.c transform.c color.c drawpoly.c archlib.h
+cylinder.o: cylinder.c transform.c color.c drawpoly.c archlib.h
+torus.o: torus.c transform.c color.c drawpoly.c archlib.h
+
 #  Create archive
-archlib.a:fatal.o errcheck.o print.o loadtexbmp.o loadobj.o projection.o
+archlib.a:fatal.o errcheck.o print.o loadtexbmp.o loadobj.o projection.o cube.o cylinder.o torus.o color.o transform.o drawpoly.o
 	ar -rcs $@ $^
 
 # Compile rules
