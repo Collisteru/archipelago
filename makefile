@@ -4,6 +4,12 @@ EXE=archipelago
 # Main target
 all: $(EXE)
 
+# Perlin target
+perlin:perlin.o
+	gcc $(CFLG) -o $@ $^  $(LIBS)
+
+perlin.o: perlin.c
+
 #  Msys/MinGW
 ifeq "$(OS)" "Windows_NT"
 CFLG=-O3 -Wall -DUSEGLEW

@@ -75,6 +75,14 @@ void Crout(double M[16],int I[4]);
 void Transform(float x0,float y0,float z0, float Sx,float Sy,float Sz, float th,float ph);
 void Color(float R,float G,float B);
 
+
+// Functions from perlin.c
+float smoothstep(int t);
+float lerp(float t,float a,float b);
+float* generate_gradient();
+float** Perlin2D(int vectorNumber, int pointDensity, int octaves);
+
+
 // Global Variables Required by Files Outside archipelago.c
 extern Point  Lp;        // Light position in local coordinate system
 extern Point  Nc,Ec;     // Far or near clipping plane in local coordinate system
