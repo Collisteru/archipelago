@@ -8,7 +8,7 @@ all: $(EXE)
 perlin:perlin.o
 	gcc $(CFLG) -o $@ $^  $(LIBS)
 
-perlin.o: perlin.c
+perlin.o: perlin.cpp
 
 #  Msys/MinGW
 ifeq "$(OS)" "Windows_NT"
