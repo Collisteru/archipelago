@@ -285,7 +285,7 @@ void display()
    glPopMatrix();
 
    //  Draw the scene
-   DrawScene(1);
+   DrawScene();
 
    //  Draw axes (white)
    glColor3f(1,1,1);

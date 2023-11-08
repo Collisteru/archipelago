@@ -31,20 +31,20 @@ CLEAN=rm -f $(EXE) *.o *.a
 endif
 
 # Dependencies -- Utility Functions
-archipelago.o: archipelago.c archlib.h
-fatal.o: fatal.c archlib.h
-errcheck.o: errcheck.c archlib.h
-print.o: print.c archlib.h
-loadtexbmp.o: loadtexbmp.c archlib.h
-loadobj.o: loadobj.c archlib.h
-projection.o: projection.c archlib.h
+archipelago.o: archipelago.cpp archlib.h
+fatal.o: fatal.cpp archlib.h
+errcheck.o: errcheck.cpp archlib.h
+print.o: print.cpp archlib.h
+loadtexbmp.o: loadtexbmp.cpp archlib.h
+loadobj.o: loadobj.cpp archlib.h
+projection.o: projection.cpp archlib.h
 
-transform.o: transform.c archlib.h
+transform.o: transform.cpp archlib.h
 
 # Dependencies -- Objects
-cube.o: cube.c transform.c color.c drawpoly.c archlib.h
-cylinder.o: cylinder.c transform.c color.c drawpoly.c archlib.h
-torus.o: torus.c transform.c color.c drawpoly.c archlib.h
+cube.o: cube.cpp transform.cpp color.cpp drawpoly.cpp archlib.h
+cylinder.o: cylinder.cpp transform.cpp color.cpp drawpoly.cpp archlib.h
+torus.o: torus.cpp transform.cpp color.cpp drawpoly.cpp archlib.h
 
 #  Create archive
 archlib.a:fatal.o errcheck.o print.o loadtexbmp.o loadobj.o projection.o cube.o cylinder.o torus.o color.o transform.o drawpoly.o
