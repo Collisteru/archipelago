@@ -11,7 +11,7 @@
 #include <numeric>
 
 
-
+using namespace std;
 
 // Function Perlin for 2D noise=
 // numVectors
@@ -39,12 +39,14 @@ float fading_function(float t) {
 }
 
 // Generate a random unit vector. This is equivalent to choosing a random point on a unit circle.
-float* generate_gradient(float gradient[2]) {
+vector<double> generate_gradient() {
     // Choose theta as a random variable
     // generate the resulting coordinates with (x,y) = (cos(theta), sin(theta)), then normalize.
 
     rand();
-    float theta = ((float)rand());
+    double theta = ((float)rand());
+
+    vector<double> gradient(2);
 
     double x = cos(theta);
     double y = sin(theta);
@@ -58,98 +60,66 @@ float* generate_gradient(float gradient[2]) {
 }
 
 
-float** Perlin2D(int vectorNumber, int pointDensity, int octaves) {
+vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves) {
 
     // Initialize and handle vector array
 
-    int pointNumber = vectorNumber * pointDensity;
+    int pointNumber = (vectorNumber - 1) * pointDensity;
 
     int d = pointDensity;
 
-    float*** nodes = (float***)malloc(vectorNumber * sizeof(float*));
+    vector<vector<vector<double>>> nodes(vectorNumber, vector<vector<double>>(vectorNumber, vector<double>(2)));
 
-    if (nodes == NULL) {
-        fprintf(stderr, "Memory allocation failed.\n");
-        return NULL;
-    }
-
-    for (int i = 0; i < vectorNumber; i++) {
-        nodes[i] = (float**)malloc(vectorNumber * sizeof(float*));
-        if (nodes[i] == NULL) {
-            fprintf(stderr, "Memory allocation failed.\n");
-            // You may need to deallocate previously allocated memory here.
-            return NULL;
-        }
-
-        for (int j = 0; j < vectorNumber; j++) {
-            nodes[i][j] = (float*)malloc(2 * sizeof(float));
-            if (nodes[i][j] == NULL) {
-                fprintf(stderr, "Memory allocation failed.\n");
-                // Deallocate previously allocated memory here.
-                return NULL;
-            }
-        }
-    }
 
     // Assign to each value in nodes a gradient
     for (int i = 0; i < vectorNumber; i++) {
         for (int j = 0; j < vectorNumber; j++) {
-            nodes[i][j] = generate_gradient(nodes[i][j]);
+
+            vector<double> gradient = generate_gradient();
+            nodes[i][j][0] = gradient[0];
+            nodes[i][j][1] = gradient[1];
             printf("vector[%d][%d]: %f, %f \n", i, j, nodes[i][j][0], nodes[i][j][1]);
         }
     }
 
     // Initialize and handle point array
-    float** noise = (float**)malloc(pointNumber * sizeof(float*));
-
-    if (noise == NULL) {
-        fprintf(stderr, "Point Memory allocation failed.\n");
-        return NULL;
-    }
-
-    for (int i = 0; i < pointNumber; i++) {
-        noise[i] = (float*)malloc(pointNumber * sizeof(float));
-        if (noise[i] == NULL) {
-            fprintf(stderr, "Point Memory allocation failed.\n");
-            // You may need to deallocate previously allocated memory here.
-            return NULL;
-        }
-    }
-
-    // Initialize and handle elevation array
-    float** elevations = (float**)malloc(pointNumber * sizeof(float*));
-
-    if (noise == NULL) {
-        fprintf(stderr, "Elevation Memory allocation failed.\n");
-        return NULL;
-    }
-
-    for (int i = 0; i < pointNumber; i++) {
-        noise[i] = (float*)malloc(pointNumber * sizeof(float));
-        if (noise[i] == NULL) {
-            fprintf(stderr, "Elevation Memory allocation failed.\n");
-            // You may need to deallocate previously allocated memory here.
-            return NULL;
-        }
-    }
-
+    vector<vector<double>> noise(pointNumber, vector<double>(pointNumber, 0));
     // Calculate the noise level of each point in the point array.
     for (int j = 0; j < pointNumber; j++) {
         for (int i = 0; i < pointNumber; i++) {
             // Find the four nodes that surround a specific point.
-            float point = noise[i][j];
-            float* top_left = nodes[i/d][(j/d)+1];
-            float* top_right = nodes[(i/d)+1][(j/d)+1];
-            float* bottom_left = nodes[i/d][j/d];
-            float* bottom_right = nodes[(i/d)+1][j/d];
+            float point = 0;
+
+            int left_coord = (i/d);
+            int right_coord = min((i/d) + 1, vectorNumber-1);
+            int top_coord = min((j/d)+1, vectorNumber-1);
+            int bottom_coord = (j/d);
+            
+            printf("i: %d, j: %d, left_coord: %d, right_coord: %d, top_coord: %d, bottom_coord: %d \n",i, j,  left_coord, right_coord, top_coord, bottom_coord);
+
+            vector<double> top_left = nodes[left_coord][top_coord];
+            vector<double> top_right = nodes[right_coord][top_coord];
+            vector<double> bottom_left = nodes[left_coord][bottom_coord];
+            vector<double> bottom_right = nodes[right_coord][bottom_coord];
 
             // Find the vector distance from each of the outer points.
+
             float c = (float)1/(float)(d+1);
 
-            float ul_d_vec[2] = {c * ((i % d) + 1), c * (d - (j % d))};
-            float ur_d_vec[2] = {c * (d - (i % d)), c * (d - (j % d))};
-            float bl_d_vec[2] = {c * ((i % d) + 1), c * (j % d + 1)};
-            float br_d_vec[2] = {c * (d - (i % d)), c * (j % d + 1)};
+            float left_wall_distance = c * ((i % d) + 1);
+            float right_wall_distance = c * (d - (i % d));
+
+            float ceiling_distance = c * (d - (j % d));
+            float floor_distance = c * (j % d + 1);
+
+            float ul_d_vec[2] = {left_wall_distance, ceiling_distance};
+
+            float ur_d_vec[2] = {right_wall_distance, ceiling_distance};
+            float bl_d_vec[2] = {left_wall_distance,floor_distance};
+            float br_d_vec[2] = {right_wall_distance, floor_distance};
+
+
+           
 
             // Find the vertical displaceent of each of the nodes
             // SKIP FOR NOW; CAN DO LATER.
@@ -159,11 +129,11 @@ float** Perlin2D(int vectorNumber, int pointDensity, int octaves) {
             float tl_grad;
 
 
-            // printf("For point (%d, %d), the nodes are (clockwise, starting from the top right): \\
-            //  (%d, %d), (%d, %d), (%d, %d), (%d, %d). \n", i, j, (i/d)+1, (j/d)+1, (i/d)+1, j/d, i/d, j/d, i/d, (j/d)+1);
+            printf("For point (%d, %d), the nodes are (clockwise, starting from the top right): \\
+             (%d, %d), (%d, %d), (%d, %d), (%d, %d). \n", i, j, (i/d)+1, (j/d)+1, (i/d)+1, j/d, i/d, j/d, i/d, (j/d)+1);
 
-            // printf("For point (%d, %d), the distances from the nearby gradients nodes are (clockwise, starting from the top right): \\
-            //  (%f, %f), (%f, %f), (%f, %f), (%f, %f). \n", i, j, ur_d_vec[0], ur_d_vec[1], br_d_vec[0], br_d_vec[1], bl_d_vec[0], bl_d_vec[1], ul_d_vec[0], ul_d_vec[1]);
+            printf("For point (%d, %d), the distances from the nearby gradients nodes are (clockwise, starting from the top right): \\
+             (%f, %f), (%f, %f), (%f, %f), (%f, %f). \n", i, j, ur_d_vec[0], ur_d_vec[1], br_d_vec[0], br_d_vec[1], bl_d_vec[0], bl_d_vec[1], ul_d_vec[0], ul_d_vec[1]);
         }
     }
 
@@ -172,17 +142,11 @@ float** Perlin2D(int vectorNumber, int pointDensity, int octaves) {
 
 int main() {
     srand(time(NULL));
-    int vectorNumber = 8;
-    int pointDensity = 20;
+    int vectorNumber = 3;
+    int pointDensity = 2;
     int octaves = 1;
 
-    float** myArray = Perlin2D(vectorNumber, pointDensity, octaves);
-
-    // // Deallocate memory when done (causes segmentation fault)
-    // for (int i = 0; i < pointNumber; i++) {
-    //     free(myArray[i]);
-    // }
-    // free(myArray);
+    vector<vector<double>> noise = Perlin2D(vectorNumber, pointDensity, octaves);
 
     return 0;
 }

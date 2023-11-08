@@ -21,7 +21,7 @@
 
 // Local Variables
 int    obj=15;    // Display objects (bitmap)
-int    move=1;    // Light movement
+int    moveFlag=1;    // Light movement
 int    axes=1;    // Display axes
 int    box=0;     // Display enclosing box
 int    th=-30;    // Azimuth of view angle
@@ -385,7 +385,7 @@ void key(unsigned char ch,int x,int y)
       mode = (mode+5)%6;
    //  Toggle light movement
    else if (ch == 's' || ch == 'S')
-      move = 1-move;
+      moveFlag = 1-moveFlag;
    //  Toggle box
    else if (ch == 'b' || ch == 'B')
       box = 1-box;
@@ -408,7 +408,7 @@ void key(unsigned char ch,int x,int y)
    else if (ch==']')
       zh += 1;
    //  Set idle function
-   glutIdleFunc(move?idle:NULL);
+   glutIdleFunc(moveFlag?idle:NULL);
    //  Reproject
    Project(60,asp,dim);
    //  Tell GLUT it is necessary to redisplay the scene
@@ -453,7 +453,7 @@ int main(int argc,char* argv[])
    glutReshapeFunc(reshape);
    glutSpecialFunc(special);
    glutKeyboardFunc(key);
-   glutIdleFunc(move?idle:NULL);
+   glutIdleFunc(moveFlag?idle:NULL);
 
    //  Check stencil depth
    glGetIntegerv(GL_STENCIL_BITS,&depth);

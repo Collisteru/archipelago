@@ -6,6 +6,9 @@
 #include <stdarg.h>
 #include <string.h>
 #include <math.h>
+#include <vector>
+
+using namespace std;
 
 // GLEW _MUST_ be included first
 #ifdef USEGLEW
@@ -79,8 +82,8 @@ void Color(float R,float G,float B);
 // Functions from perlin.c
 float smoothstep(int t);
 float lerp(float t,float a,float b);
-float* generate_gradient();
-float** Perlin2D(int vectorNumber, int pointDensity, int octaves);
+vector<double> generate_gradient();
+vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves);
 
 
 // Global Variables Required by Files Outside archipelago.c

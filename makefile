@@ -5,10 +5,8 @@ EXE=archipelago
 all: $(EXE)
 
 # Perlin target
-perlin:perlin.o
-	gcc $(CFLG) -o $@ $^  $(LIBS)
-
-perlin.o: perlin.cpp
+perlin: perlin.cpp
+	g++ $(CFLG) -o perlin $^  $(LIBS) -std=c++17
 
 #  Msys/MinGW
 ifeq "$(OS)" "Windows_NT"
@@ -19,7 +17,7 @@ else
 #  OSX
 ifeq "$(shell uname)" "Darwin"
 RES=$(shell uname -r|sed -E 's/(.).*/\1/'|tr 12 21)
-CFLG=-O3 -Wall -Wno-deprecated-declarations -DRES=$(RES)
+CFLG=-O3 -Wall -Wno-deprecated-declarationsg++  -DRES=$(RES)
 LIBS=-framework GLUT -framework OpenGL
 #  Linux/Unix/Solaris
 else
@@ -30,15 +28,17 @@ endif
 CLEAN=rm -f $(EXE) *.o *.a
 endif
 
-# Dependencies -- Utility Functions
+# Main Functions
 archipelago.o: archipelago.cpp archlib.h
+perlin.o: perlin.cpp archlib.h
+
+# Dependencies -- Utility Functions
 fatal.o: fatal.cpp archlib.h
 errcheck.o: errcheck.cpp archlib.h
 print.o: print.cpp archlib.h
 loadtexbmp.o: loadtexbmp.cpp archlib.h
 loadobj.o: loadobj.cpp archlib.h
 projection.o: projection.cpp archlib.h
-
 transform.o: transform.cpp archlib.h
 
 # Dependencies -- Objects
@@ -51,10 +51,11 @@ archlib.a:fatal.o errcheck.o print.o loadtexbmp.o loadobj.o projection.o cube.o 
 	ar -rcs $@ $^
 
 # Compile rules
-.c.o:
-	gcc -c $(CFLG)  $<
 .cpp.o:
-	g++ -c $(CFLG)  $<
+	g++ -c $(CFLG)  $< 
+.c.o:
+	gcc -c $(CFLG)  $< 
+
 
 #  Link
 archipelago:archipelago.o   archlib.a
