@@ -59,7 +59,7 @@ archlib.a:fatal.o errcheck.o print.o loadtexbmp.o loadobj.o projection.o cube.o 
 
 
 #  Link
-archipelago: archipelago.cpp archlib.a perlin.cpp
+archipelago: archipelago.cpp archlib.a
 	g++ $(CFLG) -o $@ $^  $(LIBS)
 
 #  Clean
