@@ -39,7 +39,6 @@ double joint_fade(double a, double b) {
     return fade(a) * fade(b);
 }
 
-
 // Generate a random unit vector. This is equivalent to choosing a random point on a unit circle.
 vector<double> generate_gradient() {
     // Choose theta as a random variable
@@ -68,9 +67,9 @@ vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves)
 
     // Initialize and handle vector array
 
-    int pointNumber = (vectorNumber - 1) * pointDensity;
-
     int d = pointDensity;
+
+    int pointNumber = (vectorNumber - 1) * pointDensity;
 
     vector<vector<vector<double>>> nodes(vectorNumber, vector<vector<double>>(vectorNumber, vector<double>(2)));
 
@@ -95,6 +94,9 @@ vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves)
     // Calculate the noise level of each point in the point array.
     for (int j = 0; j < pointNumber; j++) {
         for (int i = 0; i < pointNumber; i++) {
+
+            // printf("~~~NEW POINT ~~ \n\n\n");
+
             // Find the four nodes that surround a specific point.
 
             int left_coord = (i/d);
@@ -109,7 +111,11 @@ vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves)
             vector<double> bottom_left = nodes[left_coord][bottom_coord];
             vector<double> bottom_right = nodes[right_coord][bottom_coord];
 
-            // Find the vector distance from each of the outer points.
+            // printf(" \n For point (%d, %d), the nodes are (clockwise, starting from the top right): \\
+            //   (%d, %d), (%d, %d), (%d, %d), (%d, %d). \n", i, j, (i/d)+1, (j/d)+1, (i/d)+1, j/d, i/d, j/d, i/d, (j/d)+1);
+
+
+            // Find the absolute value distance from each of the outer points.
 
             float c = (float)1/(float)(d+1);
 
@@ -121,10 +127,10 @@ vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves)
 
             // printf("Surface distances: Left Wall: %f, Right Wall: %f, Ceiling: %f, Floor: %f \n", left_wall_distance, right_wall_distance, ceiling_distance, floor_distance);
 
-            vector<double> ul_d_vec = {left_wall_distance, ceiling_distance};
-            vector<double> ur_d_vec = {right_wall_distance, ceiling_distance};
+            vector<double> ul_d_vec = {left_wall_distance, - ceiling_distance};
+            vector<double> ur_d_vec = {- right_wall_distance, - ceiling_distance};
             vector<double> bl_d_vec = {left_wall_distance, floor_distance};
-            vector<double> br_d_vec = {right_wall_distance, floor_distance};
+            vector<double> br_d_vec = {- right_wall_distance, floor_distance};
 
 
             // Take the dot product of the distance vectors and the gradient vectors
@@ -136,6 +142,11 @@ vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves)
             double bl_product = bl_d_vec[0] * bottom_left[0] + bl_d_vec[1] * bottom_left[1];
             double br_product = br_d_vec[0] * bottom_right[0] + br_d_vec[1] * bottom_right[1];
 
+            // double ul_product = ul_d_vec[1] * top_left[1];
+            // double ur_product =  ur_d_vec[1] * top_right[1];
+            // double bl_product = bl_d_vec[1] * bottom_left[1];
+            // double br_product = br_d_vec[1] * bottom_right[1];
+
             // Find the vertical displaceent of each of the nodes
             // SKIP FOR NOW; CAN DO LATER.
 
@@ -143,17 +154,19 @@ vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves)
 
             // printf("Dot products: Upper Left: %f, Upper Right: %f, Bottom Left: %f, Bottom Right: %f \n", ul_product, ur_product, bl_product, br_product);
 
-            noise[i][j] = joint_fade(left_wall_distance, floor_distance) * bl_product + \
-                          joint_fade(left_wall_distance, ceiling_distance) * ul_product + \
-                          joint_fade(right_wall_distance, ceiling_distance) * ur_product + \
-                          joint_fade(right_wall_distance, floor_distance) * br_product;
+            double weighted_bl = joint_fade(1 - left_wall_distance, 1 - floor_distance) * bl_product;
+            double weighted_ul = joint_fade(1 - left_wall_distance, floor_distance) * ul_product;
+            double weighted_ur = joint_fade(left_wall_distance, floor_distance) * ur_product;
+            double weighted_br = joint_fade(left_wall_distance, 1 - floor_distance) * br_product;
+
+            // printf("Weighted elevation summands for point (%d, %d): weighted_bl: %f, weighted_ul: %f, weighted_ur: %f, weighted_br: %f \n", i, j, weighted_bl, weighted_ul, weighted_ur, weighted_br);
+
+            noise[i][j] = weighted_bl + weighted_ul + weighted_ur + weighted_br;
 
 
-            /* printf("For point (%d, %d), the nodes are (clockwise, starting from the top right): \\
-              (%d, %d), (%d, %d), (%d, %d), (%d, %d). \n", i, j, (i/d)+1, (j/d)+1, (i/d)+1, j/d, i/d, j/d, i/d, (j/d)+1); */
 
-            /* printf("For point (%d, %d), the distances from the nearby gradients nodes are (clockwise, starting from the top right): \\
-              (%f, %f), (%f, %f), (%f, %f), (%f, %f). \n", i, j, ur_d_vec[0], ur_d_vec[1], br_d_vec[0], br_d_vec[1], bl_d_vec[0], bl_d_vec[1], ul_d_vec[0], ul_d_vec[1]); */
+            // printf("For point (%d, %d), the distances from the nearby gradients nodes are (clockwise, starting from the top right): \\
+            //   (%f, %f), (%f, %f), (%f, %f), (%f, %f). \n", i, j, ur_d_vec[0], ur_d_vec[1], br_d_vec[0], br_d_vec[1], bl_d_vec[0], bl_d_vec[1], ul_d_vec[0], ul_d_vec[1]);
 
             // printf("For point (%d, %d), the final noise value is: %f \n", i, j, noise[i][j]);
         }

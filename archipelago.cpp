@@ -45,8 +45,8 @@ Point Nc,Ec;
 float Lpos[4];
 
 // Perlin Variables
-int vectorNumber = 3;
-int pointDensity = 500;
+int vectorNumber = 10;
+int pointDensity = 200;
 vector<vector<double>> noise;
 
 //  Mode text
