@@ -9,10 +9,16 @@
 
 #include <vector>
 #include <numeric>
+#include <iostream>
+#include <ranges>
+
+
 #include <windows.h>
 
 
 using namespace std;
+
+namespace views = std::views;
 
 // Function Perlin for 2D noise
 // Point density (also symmetrical) (pi) (Points between each vector)
@@ -33,10 +39,6 @@ double joint_fade(double a, double b) {
     return fade(a) * fade(b);
 }
 
-// Linear interpolation between a and b, given a fraction t.
-float lerp(float t,float a,float b) {
-    return a + t * (b - a);
-}
 
 // Generate a random unit vector. This is equivalent to choosing a random point on a unit circle.
 vector<double> generate_gradient() {
@@ -156,10 +158,36 @@ vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves)
             // printf("For point (%d, %d), the final noise value is: %f \n", i, j, noise[i][j]);
         }
     }
-
     return noise;
 }
 
+void Terrain(int vectorNumber, int pointDensity, vector<vector<double>> noise) 
+{
+    // int a = 10;
+
+    double pointNumber = (vectorNumber - 1) * pointDensity;
+
+    vector<double> xrange(pointNumber);
+    vector<double> zrange(pointNumber);
+
+    std::iota(xrange.begin(), xrange.end(), 0);
+
+    std::iota(zrange.begin(), zrange.end(), 0);
+
+    for (int i = 0 ; i < size(xrange); i++) {
+        xrange[i] = (xrange[i]  - (pointNumber) / 2)  / pointDensity;
+        zrange[i] = (zrange[i]  - (pointNumber) / 2)  / pointDensity;
+    }
+
+
+    glBegin(GL_POINTS);
+        for (int i = 0 ; i < pointNumber; i++) {
+            for (int j = 0 ; j < pointNumber; j++) {
+                glVertex3f(zrange[i], noise[i][j],  xrange[j]);
+            }
+        }
+    glEnd();
+}
 
 // Perlin Testing Suite:
 

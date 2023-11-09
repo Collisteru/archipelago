@@ -36,12 +36,18 @@ int    zh=0;      // Light azimuth
 float  Ylight=2;  // Elevation of light
 int    light = 0;     // Light mode: true=draw polygon, false=draw shadow volume
 
+
 // Global Variables (declared in archlib.c)
 int mode = 0;
 int dim=3; // Size of World
 Point Lp;
 Point Nc,Ec;
 float Lpos[4];
+
+// Perlin Variables
+int vectorNumber = 3;
+int pointDensity = 500;
+vector<vector<double>> noise;
 
 //  Mode text
 const char* text[] = {"Shadowed Object","Front Shadows","Back Shadows","Lit Object","Z-pass","Z-fail"};
@@ -181,6 +187,7 @@ static void Light(int on)
  */
 void Scene(int Light)
 {
+   // SEGFAULT SOMEWHERE IN SCENE
    int k;  // Counters used to draw floor
  
    //  Set global light switch (used in DrawPolyShadow)
@@ -191,13 +198,8 @@ void Scene(int Light)
    //  Enable textures if not drawing shadow volumes
    if (light) glEnable(GL_TEXTURE_2D);
 
-   //  Draw objects         x    y   z          th,ph    dims   
-   if (obj&0x01)     Cube(-0.8,+0.8,0.0 , -0.25*zh, 0  , 0.3    );
-   if (obj&0x02) Cylinder(+0.8,+0.5,0.0 ,   0.5*zh,zh  , 0.2,0.5);
-   if (obj&0x04)    Torus(+0.5,-0.8,0.0 ,        0,zh  , 0.5,0.2);
-
    // Draw Perlin Elevation
-   
+   Terrain(vectorNumber, pointDensity, noise);
 
    //  Disable textures
    if (light) glDisable(GL_TEXTURE_2D);
@@ -457,6 +459,9 @@ int main(int argc,char* argv[])
    //  Initialize GLUT
    glutInit(&argc,argv);
 
+   // Generate Perlin Noise
+   noise = Perlin2D(vectorNumber,pointDensity,1);
+
    //  Request double buffered, true color window with Z buffering & stencil at 600x600
    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE | GLUT_STENCIL);
    glutInitWindowSize(600,600);
@@ -473,8 +478,7 @@ int main(int argc,char* argv[])
    glutKeyboardFunc(key);
    glutIdleFunc(moveFlag?idle:NULL);
 
-   // Generate Perlin Noise
-   vector<vector<double>> noise = Perlin2D(20,30,1);
+  
 
    printf("First element of noise is %f \n", noise[0][0]);
    printf("Second element of noise is %f \n", noise[0][1]);
@@ -491,6 +495,7 @@ int main(int argc,char* argv[])
 
    //  Pass control to GLUT so it can interact with the user
    ErrCheck("init");
+
    glutMainLoop();
    return 0;
 }

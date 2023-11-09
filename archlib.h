@@ -47,8 +47,8 @@ using namespace std;
 #endif
 
 //  cos and sin in degrees
-#define Cos(th) cos(3.14159265/180*(th))
-#define Sin(th) sin(3.14159265/180*(th))
+#define Cos(th) static_cast<float>(cos(3.14159265/180.0 * static_cast<float>(th)))
+#define Sin(th) static_cast<float>(sin(3.14159265/180* static_cast<float>(th)))
 
 #ifdef __cplusplus
 extern "C" {
@@ -81,9 +81,9 @@ void Color(float R,float G,float B);
 
 // Functions from perlin.c
 float smoothstep(int t);
-float lerp(float t,float a,float b);
 vector<double> generate_gradient();
 vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves);
+void Terrain(int vectorNumber, int pointDensity, vector<vector<double>> noise);
 
 
 // Global Variables Required by Files Outside archipelago.c

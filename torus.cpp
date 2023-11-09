@@ -13,13 +13,13 @@ void Torus(float x,float y,float z , float th,float ph , float S,float r)
    //  Loop along ring
    for (i=0;i<N;i++)
    {
-      float th0 =  i   *360.0/N;
-      float th1 = (i+1)*360.0/N;
+      double th0 =  i   *360.0/N;
+      double th1 = (i+1)*360.0/N;
       //  Loop around ring
       for (j=0;j<N;j++)
       {
-         float ph0 =  j   *360.0/N;
-         float ph1 = (j+1)*360.0/N;
+         double ph0 =  j   *360.0/N;
+         double ph1 = (j+1)*360.0/N;
          Point P[4] = { {Cos(th1)*(1+r*Cos(ph0)),-Sin(th1)*(1+r*Cos(ph0)),r*Sin(ph0)} ,
                         {Cos(th0)*(1+r*Cos(ph0)),-Sin(th0)*(1+r*Cos(ph0)),r*Sin(ph0)} ,
                         {Cos(th0)*(1+r*Cos(ph1)),-Sin(th0)*(1+r*Cos(ph1)),r*Sin(ph1)} ,
@@ -28,10 +28,10 @@ void Torus(float x,float y,float z , float th,float ph , float S,float r)
                         {Cos(th0)*Cos(ph0) , -Sin(th0)*Cos(ph0) , Sin(ph0)} ,
                         {Cos(th0)*Cos(ph1) , -Sin(th0)*Cos(ph1) , Sin(ph1)} ,
                         {Cos(th1)*Cos(ph1) , -Sin(th1)*Cos(ph1) , Sin(ph1)} };
-         Point T[4] = { {th1/30.0 , ph0/180.0 , 0} ,
-                        {th0/30.0 , ph0/180.0 , 0} ,
-                        {th0/30.0 , ph1/180.0 , 0} ,
-                        {th1/30.0 , ph1/180.0 , 0} };
+         Point T[4] = { {static_cast<float>(th1/30.0) , static_cast<float>(ph0/180.0) , 0} ,
+                        {static_cast<float>(th0/30.0) , static_cast<float>(ph0/180.0) , 0} ,
+                        {static_cast<float>(th0/30.0) , static_cast<float>(ph0/30.0) , 0} ,
+                        {static_cast<float>(th1/30.0) , static_cast<float>(ph0/30.0) , 0} };
          DrawPoly(P,N,T,4);
       }
    }

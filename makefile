@@ -53,14 +53,14 @@ archlib.a:fatal.o errcheck.o print.o loadtexbmp.o loadobj.o projection.o cube.o 
 
 # Compile rules
 .cpp.o:
-	g++ -c $(CFLG)  $< 
+	g++ -c $(CFLG)  $< -std=c++20
 .c.o:
-	gcc -c $(CFLG)  $< 
+	gcc -c $(CFLG)  $< -std=c++20
 
 
 #  Link
 archipelago: archipelago.cpp archlib.a
-	g++ $(CFLG) -o $@ $^  $(LIBS)
+	g++ $(CFLG) -o $@ $^  $(LIBS) -std=c++20
 
 #  Clean
 clean:
