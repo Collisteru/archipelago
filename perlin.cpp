@@ -196,9 +196,26 @@ void Terrain(int vectorNumber, int pointDensity, vector<vector<double>> noise)
     glBegin(GL_POINTS);
         for (int i = 0 ; i < pointNumber; i++) {
             for (int j = 0 ; j < pointNumber; j++) {
+                double noiseValue = noise[i][j];
+                if (noiseValue < -0.3) {
+                    // Set point to blue
+                    glColor3f(0.0f, 0.0f, 1.0f);
+                } else if (noiseValue < 0) {
+                    // Set point to green
+                    glColor3f(0.0f, 1.0f, 0.0f);
+                } else if (noiseValue < 0.3) {
+                    // Color point brown
+                    glColor3f(0.6f, 0.3f, 0.0f);
+                } else if (noiseValue < 0.8) {
+                    // Color point white
+                    glColor3f(1.0f, 1.0f, 1.0f);
+                }
+
+
                 glVertex3f(zrange[i], noise[i][j],  xrange[j]);
             }
         }
+        glColor3f(1.0f, 1.0f, 1.0f);
     glEnd();
 }
 
