@@ -460,7 +460,7 @@ int main(int argc,char* argv[])
    glutInit(&argc,argv);
 
    // Generate Perlin Noise
-   noise = Perlin2D(vectorNumber,pointDensity,1);
+   noise = Perlin2D(vectorNumber,pointDensity,4);
 
    //  Request double buffered, true color window with Z buffering & stencil at 600x600
    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE | GLUT_STENCIL);
