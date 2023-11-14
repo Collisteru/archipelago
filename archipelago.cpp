@@ -39,7 +39,7 @@ int    light = 0;     // Light mode: true=draw polygon, false=draw shadow volume
 
 // Global Variables (declared in archlib.c)
 int mode = 0;
-int dim=3; // Size of World
+double dim=3; // Size of World
 Point Lp;
 Point Nc,Ec;
 float Lpos[4];
@@ -234,7 +234,7 @@ static void DrawScene()
    //  Enable lighting
    //  Render the parts of objects not in shadows
    //  (The mode test is for demonstrating unlit objects only)
-   Light(1);
+   Light(0);
    Scene(1);
 
    //  Make color buffer and Z buffer read-only
@@ -295,11 +295,12 @@ void display()
    gluLookAt(Ex,Ey,Ez , 0,0,0 , 0,Cos(ph),0);
 
    //  Draw light position as sphere (still no lighting here)
-   glColor3f(1,1,1);
-   glPushMatrix();
-   glTranslated(Lpos[0],Lpos[1],Lpos[2]);
-   glutSolidSphere(0.03,10,10);
-   glPopMatrix();
+   // Light sphere disabled for now
+   // glColor3f(1,1,1);
+   // glPushMatrix();
+   // glTranslated(Lpos[0],Lpos[1],Lpos[2]);
+   // glutSolidSphere(0.03,10,10);
+   // glPopMatrix();
 
 
 
@@ -330,9 +331,18 @@ void display()
    }
 
    //  Display parameters
-   // glWindowPos2i(5,5);
-   // Print("Ylight=%.1f Angle=%d,%d,%d  Dim=%.1f Slices=%d Mode=%s Inf=%s Stencil=%d",
-   //   Ylight,th,ph,zh,dim,n,text[mode],inf?"Fixed":"Calculated",depth);
+   glWindowPos2i(5,5);
+   glColor3f(1.0f, 1.0f, 0.0f);
+   
+   Print("z to zoom out. x to zoom in. \n");
+   glEnable(GL_LIGHTING);
+
+   glColor3f(1.0f, 0.0f, 0.0f);
+   glWindowPos2i(20,20);
+   glDisable(GL_LIGHTING);
+   glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18,'H');
+   
+
 
    //  Render the scene and make it visible
    ErrCheck("display");
@@ -369,12 +379,6 @@ void special(int key,int x,int y)
    //  Down arrow key - decrease elevation by 5 degrees
    else if (key == GLUT_KEY_DOWN)
       ph -= 1;
-   //  PageUp key - increase dim
-   else if (key == GLUT_KEY_PAGE_DOWN)
-      dim += 0.1;
-   //  PageDown key - decrease dim
-   else if (key == GLUT_KEY_PAGE_UP && dim>1)
-      dim -= 0.1;
    //  Keep angles to +/-360 degrees
    th %= 360;
    ph %= 360;
@@ -427,6 +431,11 @@ void key(unsigned char ch,int x,int y)
       zh -= 1;
    else if (ch==']')
       zh += 1;
+   // Zoom
+   else if (ch=='z')
+      dim += 0.05;
+   else if (ch=='x')
+      dim -= 0.05;
    //  Set idle function
    glutIdleFunc(moveFlag?idle:NULL);
    //  Reproject
@@ -478,11 +487,9 @@ int main(int argc,char* argv[])
    glutKeyboardFunc(key);
    glutIdleFunc(moveFlag?idle:NULL);
 
-  
-
-   printf("First element of noise is %f \n", noise[0][0]);
-   printf("Second element of noise is %f \n", noise[0][1]);
-   printf("Third element of noise is %f \n", noise[0][2]);
+   // printf("First element of noise is %f \n", noise[0][0]);
+   // printf("Second element of noise is %f \n", noise[0][1]);
+   // printf("Third element of noise is %f \n", noise[0][2]);
 
    //  Check stencil depth
    glGetIntegerv(GL_STENCIL_BITS,&depth);

@@ -18,6 +18,10 @@ void Print(const char* format , ...)
    vsnprintf(buf,LEN,format,args);
    va_end(args);
    //  Display the characters one at a time at the current raster position
+   
+   // Set color
+   glColor3f(1, 1, 0);
+   glDisable(GL_LIGHTING);
    while (*ch)
       glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18,*ch++);
 }

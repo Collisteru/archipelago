@@ -92,7 +92,7 @@ extern Point  Nc,Ec;     // Far or near clipping plane in local coordinate syste
 
 extern float  Lpos[4];   // Light position
 extern int    mode;    // Display mode
-extern int dim;     // Size of world
+extern double dim;     // Size of world
 
 
 
