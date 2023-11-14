@@ -215,6 +215,7 @@ void Terrain(int vectorNumber, int pointDensity, vector<vector<double>> noise)
     glBegin(GL_POINTS);
         for (int i = 0 ; i < pointNumber; i++) {
             for (int j = 0 ; j < pointNumber; j++) {
+                
                 double noiseValue = noise[i][j];
                 if (noiseValue < -0.3) {
                     // Set point to blue
@@ -235,6 +236,29 @@ void Terrain(int vectorNumber, int pointDensity, vector<vector<double>> noise)
             }
         }
         glColor3f(1.0f, 1.0f, 1.0f);
+    glEnd();
+}
+
+//
+//  Print a patch of terrain from a point array to test terrain rendering with quads.
+//
+void terrainPatch(vector<vector<vector<double>>> points, int numPoints)
+{
+    // Generate a random number for the z value and render the vertex as one of four quad points
+    glBegin(GL_QUADS);
+    for (int i = 0; i < (numPoints - 1); i++) {
+        for(int j = 0; j < (numPoints - 1); j++) {
+            vector<double> bl = points[i][j];
+            vector<double> tl = points[i][j+1];
+            vector<double> tr = points[i+1][j+1];
+            vector<double> br = points[i+1][j];
+
+            glVertex3f(bl[0], bl[1], bl[2]);
+            glVertex3f(tl[0], tl[1], tl[2]);
+            glVertex3f(tr[0], tr[1], tr[2]);
+            glVertex3f(br[0], br[1], br[2]);
+        }
+    }
     glEnd();
 }
 

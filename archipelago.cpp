@@ -61,93 +61,9 @@ int vectorNumber = 10;
 int pointDensity = 200;
 vector<vector<double>> noise;
 
-//  Mode text
-const char* text[] = {"Shadowed Object","Front Shadows","Back Shadows","Lit Object","Z-pass","Z-fail"};
-
 #define MAXN 64    // Maximum number of slices (n) and points in a polygon
 
 using namespace std;
-
-/*
- *  Evaluate 2D Bezier surface
- */
-#define Bezier(x)  V*V*V*(U*U*U*p[0][0].x + 3*U*U*u*p[0][1].x + 3*U*u*u*p[0][2].x + u*u*u*p[0][3].x) \
-               + 3*V*V*v*(U*U*U*p[1][0].x + 3*U*U*u*p[1][1].x + 3*U*u*u*p[1][2].x + u*u*u*p[1][3].x) \
-               + 3*V*v*v*(U*U*U*p[2][0].x + 3*U*U*u*p[2][1].x + 3*U*u*u*p[2][2].x + u*u*u*p[2][3].x) \
-               +   v*v*v*(U*U*U*p[3][0].x + 3*U*U*u*p[3][1].x + 3*U*u*u*p[3][2].x + u*u*u*p[3][3].x)
-Point Bezier2D(Point p[4][4],float u,float v)
-{
-   float U = 1-u;
-   float V = 1-v;
-   Point P;
-   P.x = Bezier(x);
-   P.y = Bezier(y);
-   P.z = Bezier(z);
-   return P;
-}
-
-/*
- *  Evaluate 2D Bezier normal
- */
-#define ddu(x)  -U*U*(V*V*V*p[0][0].x + 3*V*V*v*p[1][0].x + 3*V*v*v*p[2][0].x + v*v*v*p[3][0].x) \
-         + (1-3*u)*U*(V*V*V*p[0][1].x + 3*V*V*v*p[1][1].x + 3*V*v*v*p[2][1].x + v*v*v*p[3][1].x) \
-         + u*(2-3*u)*(V*V*V*p[0][2].x + 3*V*V*v*p[1][2].x + 3*V*v*v*p[2][2].x + v*v*v*p[3][2].x) \
-         +       u*u*(V*V*V*p[0][3].x + 3*V*V*v*p[1][3].x + 3*V*v*v*p[2][3].x + v*v*v*p[3][3].x)
-#define ddv(x)  -V*V*(U*U*U*p[0][0].x + 3*U*U*u*p[0][1].x + 3*U*u*u*p[0][2].x + u*u*u*p[0][3].x) \
-         + (1-3*v)*V*(U*U*U*p[1][0].x + 3*U*U*u*p[1][1].x + 3*U*u*u*p[1][2].x + u*u*u*p[1][3].x) \
-         + v*(2-3*v)*(U*U*U*p[2][0].x + 3*U*U*u*p[2][1].x + 3*U*u*u*p[2][2].x + u*u*u*p[2][3].x) \
-         +       v*v*(U*U*U*p[3][0].x + 3*U*U*u*p[3][1].x + 3*U*u*u*p[3][2].x + u*u*u*p[3][3].x)
-Point Normal2D(Point p[4][4],float u,float v)
-{
-   float tiny=1e-6;
-   float U = 1-u;
-   float V = 1-v;
-   float D,Du,Dv;
-   Point P,Pu,Pv;
-   //  1/3 of derivative in the u direction
-   Pu.x = ddu(x);
-   Pu.y = ddu(y);
-   Pu.z = ddu(z);
-   Du = sqrt(Pu.x*Pu.x+Pu.y*Pu.y+Pu.z*Pu.z);
-   //  1/3 of derivative in the v direction
-   Pv.x = ddv(x);
-   Pv.y = ddv(y);
-   Pv.z = ddv(z);
-   Dv = sqrt(Pv.x*Pv.x+Pv.y*Pv.y+Pv.z*Pv.z);
-   //  Du=0
-   if (Du<tiny && Dv>tiny)
-   {
-      u += 0.001;
-      U -= 0.001;
-      Pu.x = ddv(x);
-      Pu.y = ddv(y);
-      Pu.z = ddv(z);
-   }
-   //  Dv=0
-   else if (Dv<tiny && Du>tiny)
-   {
-      v += 0.001;
-      V -= 0.001;
-      Pv.x = ddu(x);
-      Pv.y = ddu(y);
-      Pv.z = ddu(z);
-   }
-   //  Cross product
-   P.x = Pu.y*Pv.z - Pu.z*Pv.y;
-   P.y = Pu.z*Pv.x - Pu.x*Pv.z;
-   P.z = Pu.x*Pv.y - Pu.y*Pv.x;
-   //  Normalize
-   D = sqrt(P.x*P.x+P.y*P.y+P.z*P.z);
-   if (D>tiny)
-   {
-      P.x /= D;
-      P.y /= D;
-      P.z /= D;
-   }
-   return P;
-}
-
-
 
 
 /*
@@ -303,8 +219,6 @@ void display()
    // glPopMatrix();
 
 
-
-
    //  Draw the scene
    DrawScene();
 
@@ -335,11 +249,8 @@ void display()
    glColor3f(1.0f, 1.0f, 0.0f);
    
    Print("z to zoom out. x to zoom in. \n");
-   glEnable(GL_LIGHTING);
 
    glColor3f(1.0f, 1.0f, 1.0f);
-   glDisable(GL_LIGHTING);
-   
 
 
    //  Render the scene and make it visible

@@ -1,6 +1,8 @@
 # Example 38
 EXE=archipelago
 
+PATCH = patchtest
+
 # Main target
 all: $(EXE)
 
@@ -30,6 +32,7 @@ endif
 
 # Main Functions
 archipelago.o: archipelago.cpp archlib.h
+patchtest.o: patch_terrain_test.cpp archlib.h
 
 
 # Dependencies -- Utility Functions
@@ -60,6 +63,10 @@ archlib.a:fatal.o errcheck.o print.o loadtexbmp.o loadobj.o projection.o cube.o 
 
 #  Link
 archipelago: archipelago.cpp archlib.a
+	g++ $(CFLG) -o $@ $^  $(LIBS) -std=c++20
+
+
+patchtest: patch_terrain_test.cpp archlib.a
 	g++ $(CFLG) -o $@ $^  $(LIBS) -std=c++20
 
 #  Clean
