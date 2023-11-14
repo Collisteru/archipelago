@@ -19,6 +19,18 @@
  */
 #include "archlib.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <stdio.h>
+#include <time.h>
+#include <stdint.h>
+
+#include <vector>
+#include <numeric>
+#include <windows.h>
+
+
 // Local Variables
 int    obj=15;    // Display objects (bitmap)
 int    moveFlag=1;    // Light movement
@@ -53,18 +65,6 @@ vector<vector<double>> noise;
 const char* text[] = {"Shadowed Object","Front Shadows","Back Shadows","Lit Object","Z-pass","Z-fail"};
 
 #define MAXN 64    // Maximum number of slices (n) and points in a polygon
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <stdio.h>
-#include <time.h>
-#include <stdint.h>
-
-#include <vector>
-#include <numeric>
-#include <windows.h>
-
 
 using namespace std;
 
@@ -337,10 +337,8 @@ void display()
    Print("z to zoom out. x to zoom in. \n");
    glEnable(GL_LIGHTING);
 
-   glColor3f(1.0f, 0.0f, 0.0f);
-   glWindowPos2i(20,20);
+   glColor3f(1.0f, 1.0f, 1.0f);
    glDisable(GL_LIGHTING);
-   glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18,'H');
    
 
 
@@ -462,14 +460,11 @@ void reshape(int width,int height)
  */
 int main(int argc,char* argv[])
 {
-   // Initialize Global Variables:
-   // Globals taken from header file
-
    //  Initialize GLUT
    glutInit(&argc,argv);
 
    // Generate Perlin Noise
-   noise = Perlin2D(vectorNumber,pointDensity,4);
+   noise = Perlin2D(vectorNumber,pointDensity,2);
 
    //  Request double buffered, true color window with Z buffering & stencil at 600x600
    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE | GLUT_STENCIL);
@@ -486,19 +481,6 @@ int main(int argc,char* argv[])
    glutSpecialFunc(special);
    glutKeyboardFunc(key);
    glutIdleFunc(moveFlag?idle:NULL);
-
-   // printf("First element of noise is %f \n", noise[0][0]);
-   // printf("Second element of noise is %f \n", noise[0][1]);
-   // printf("Third element of noise is %f \n", noise[0][2]);
-
-   //  Check stencil depth
-   glGetIntegerv(GL_STENCIL_BITS,&depth);
-   if (depth<=0) Fatal("No stencil buffer\n");
-
-   //  Load textures
-   tex2d[0] = LoadTexBMP("water.bmp");
-   tex2d[1] = LoadTexBMP("crate.bmp");
-   tex2d[2] = LoadTexBMP("pi.bmp");
 
    //  Pass control to GLUT so it can interact with the user
    ErrCheck("init");
