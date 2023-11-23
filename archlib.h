@@ -83,7 +83,10 @@ void Color(float R,float G,float B);
 float smoothstep(int t);
 vector<double> generate_gradient();
 vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves);
-void Terrain(int vectorNumber, int pointDensity, vector<vector<double>> noise);
+void TerrainTrigs(int vectorNumber, int pointDensity, vector<vector<double>> noise);
+void TerrainQuads(int vectorNumber, int pointDensity, vector<vector<double>> noise);
+void TerrainDots(int vectorNumber, int pointDensity, vector<vector<double>> noise);
+
 
 
 // Global Variables Required by Files Outside archipelago.c

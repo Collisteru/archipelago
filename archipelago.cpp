@@ -30,6 +30,10 @@
 #include <numeric>
 #include <windows.h>
 
+#include <bits/stdc++.h> 
+using namespace std; 
+
+
 
 // Local Variables
 int    obj=15;    // Display objects (bitmap)
@@ -57,8 +61,9 @@ Point Nc,Ec;
 float Lpos[4];
 
 // Perlin Variables
-int vectorNumber = 10;
-int pointDensity = 200;
+int vectorNumber = 3;
+int pointDensity = 10;
+int octaves = 4;
 vector<vector<double>> noise;
 
 #define MAXN 64    // Maximum number of slices (n) and points in a polygon
@@ -115,7 +120,8 @@ void Scene(int Light)
    if (light) glEnable(GL_TEXTURE_2D);
 
    // Draw Perlin Elevation
-   Terrain(vectorNumber, pointDensity, noise);
+   if (mode == 0)  {TerrainQuads(vectorNumber, pointDensity, noise);}
+   else {TerrainDots(vectorNumber, pointDensity, noise);}
 
    //  Disable textures
    if (light) glDisable(GL_TEXTURE_2D);
@@ -164,14 +170,12 @@ static void DrawScene()
    //  Enable face culling
    glEnable(GL_CULL_FACE);
 
-
-
    //  Disable face culling
    glDisable(GL_CULL_FACE);
    //  Make color mask and depth buffer read-write
    glColorMask(1,1,1,1);
    //  Update the color only where the stencil value is 0
-   //  Do not change the stencil
+   //  Do not change the stencilE
    glStencilFunc(GL_EQUAL,0,0xFFFFFFFF);
    glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
    //  Redraw only if depth matches front object
@@ -313,9 +317,7 @@ void key(unsigned char ch,int x,int y)
       axes = 1-axes;
    //  Toggle display modes
    else if (ch == 'm')
-      mode = (mode+1)%6;
-   else if (ch == 'M')
-      mode = (mode+5)%6;
+      mode = (mode+1)%2;
    //  Toggle light movement
    else if (ch == 's' || ch == 'S')
       moveFlag = 1-moveFlag;
@@ -374,8 +376,10 @@ int main(int argc,char* argv[])
    //  Initialize GLUT
    glutInit(&argc,argv);
 
+   printf("Beginning noise generation...");
+
    // Generate Perlin Noise
-   noise = Perlin2D(vectorNumber,pointDensity,2);
+   noise = Perlin2D(vectorNumber,pointDensity,octaves);
 
    //  Request double buffered, true color window with Z buffering & stencil at 600x600
    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE | GLUT_STENCIL);
