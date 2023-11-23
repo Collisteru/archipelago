@@ -121,7 +121,8 @@ void Scene(int Light)
 
    // Draw Perlin Elevation
    if (mode == 0)  {TerrainQuads(vectorNumber, pointDensity, noise);}
-   else {TerrainDots(vectorNumber, pointDensity, noise);}
+   else if (mode == 1) {TerrainDots(vectorNumber, pointDensity, noise);}
+   else if (mode == 2) {TerrainLines(vectorNumber, pointDensity, noise);}
 
    //  Disable textures
    if (light) glDisable(GL_TEXTURE_2D);
@@ -317,7 +318,10 @@ void key(unsigned char ch,int x,int y)
       axes = 1-axes;
    //  Toggle display modes
    else if (ch == 'm')
-      mode = (mode+1)%2;
+      mode = (mode+1)%3;
+   else if (ch == 'M')
+      if (mode == 0) mode = 2;
+      else mode = mode - 1;
    //  Toggle light movement
    else if (ch == 's' || ch == 'S')
       moveFlag = 1-moveFlag;

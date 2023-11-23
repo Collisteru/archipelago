@@ -86,6 +86,7 @@ vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves)
 void TerrainTrigs(int vectorNumber, int pointDensity, vector<vector<double>> noise);
 void TerrainQuads(int vectorNumber, int pointDensity, vector<vector<double>> noise);
 void TerrainDots(int vectorNumber, int pointDensity, vector<vector<double>> noise);
+void TerrainLines(int vectorNumber, int pointDensity, vector<vector<double>> noise);
 
 
 

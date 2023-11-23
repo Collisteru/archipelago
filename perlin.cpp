@@ -209,10 +209,9 @@ void TerrainTrigs(int vectorNumber, int pointDensity, vector<vector<double>> noi
 
 
     glBegin(GL_TRIANGLES);
-        // Generate quad
+        // Generate trig
         for (int i = 0 ; i < (pointNumber - 1); i++) {
             for (int j = 0 ; j < (pointNumber - 1); j++) {
-                double noiseValue = noise[i][j];
 
                 vector<double> bl = {zrange[i], noise[i][j], xrange[j]};
                 vector<double> tl = {zrange[i], noise[i][j+1], xrange[j+1]};
@@ -236,7 +235,7 @@ void TerrainTrigs(int vectorNumber, int pointDensity, vector<vector<double>> noi
                 for(pointiter; pointiter < draw_order.end(); pointiter++)
                 {
                     vector<double> point = *pointiter;
-                    double noisevalue = point[2];
+                    double noiseValue = point[2];
                     
                     if (noiseValue < -0.3) {
                         // Set point to blue
@@ -282,7 +281,6 @@ void TerrainDots(int vectorNumber, int pointDensity, vector<vector<double>> nois
         // Generate points
         for (int i = 0 ; i < (pointNumber - 1); i++) {
             for (int j = 0 ; j < (pointNumber - 1); j++) {
-                double noiseValue = noise[i][j];
 
                 vector<double> bl = {zrange[i], noise[i][j], xrange[j]};
                 vector<double> tl = {zrange[i], noise[i][j+1], xrange[j+1]};
@@ -302,7 +300,7 @@ void TerrainDots(int vectorNumber, int pointDensity, vector<vector<double>> nois
                 for(pointiter; pointiter < quadpoints.end(); pointiter++)
                 {
                     vector<double> point = *pointiter;
-                    double noisevalue = point[1];
+                    double noiseValue = point[1];
 
                     // Tracks which colors are included in this quad
                     
@@ -333,9 +331,9 @@ void TerrainDots(int vectorNumber, int pointDensity, vector<vector<double>> nois
     glEnd();
 }
 
-void TerrainQuads(int vectorNumber, int pointDensity, vector<vector<double>> noise) 
-{
-    // int a = 10;
+
+void TerrainLines(int vectorNumber, int pointDensity, vector<vector<double>> noise) {
+     // int a = 10;
 
     double pointNumber = (vectorNumber - 1) * pointDensity;
 
@@ -351,11 +349,10 @@ void TerrainQuads(int vectorNumber, int pointDensity, vector<vector<double>> noi
         zrange[i] = (zrange[i]  - (pointNumber) / 2)  / pointDensity;
     }
 
-    glBegin(GL_QUADS);
-        // Generate quad
+    glBegin(GL_LINES);
+        // Generate points
         for (int i = 0 ; i < (pointNumber - 1); i++) {
             for (int j = 0 ; j < (pointNumber - 1); j++) {
-                double noiseValue = noise[i][j];
 
                 vector<double> bl = {zrange[i], noise[i][j], xrange[j]};
                 vector<double> tl = {zrange[i], noise[i][j+1], xrange[j+1]};
@@ -375,7 +372,7 @@ void TerrainQuads(int vectorNumber, int pointDensity, vector<vector<double>> noi
                 for(pointiter; pointiter < quadpoints.end(); pointiter++)
                 {
                     vector<double> point = *pointiter;
-                    double noisevalue = point[1];
+                    double noiseValue = point[1];
 
                     // Tracks which colors are included in this quad
                     
@@ -400,6 +397,69 @@ void TerrainQuads(int vectorNumber, int pointDensity, vector<vector<double>> noi
 
                     // access value in the memory to which the pointer
                     // is referencing
+                }
+            }
+        }
+    glEnd();
+}
+
+
+void TerrainQuads(int vectorNumber, int pointDensity, vector<vector<double>> noise) 
+{
+    // int a = 10;
+
+    double pointNumber = (vectorNumber - 1) * pointDensity;
+
+    vector<double> xrange(pointNumber);
+    vector<double> zrange(pointNumber);
+
+    std::iota(xrange.begin(), xrange.end(), 0);
+
+    std::iota(zrange.begin(), zrange.end(), 0);
+
+    for (int i = 0 ; i < size(xrange); i++) {
+        xrange[i] = (xrange[i]  - (pointNumber) / 2)  / pointDensity;
+        zrange[i] = (zrange[i]  - (pointNumber) / 2)  / pointDensity;
+    }
+
+    glBegin(GL_QUADS);
+        // Generate quad
+        for (int i = 0 ; i < (pointNumber - 1); i++) {
+            for (int j = 0 ; j < (pointNumber - 1); j++) {
+
+                vector<double> bl = {zrange[i], noise[i][j], xrange[j]};
+                vector<double> tl = {zrange[i], noise[i][j+1], xrange[j+1]};
+                vector<double> tr = {zrange[i+1], noise[i+1][j+1], xrange[j+1]};
+                vector<double> br = {zrange[i+1], noise[i+1][j], xrange[j]};
+
+                vector<vector<double>> quadpoints = {bl, tl, tr, br};
+
+                //decleration of vector iterator
+                vector<vector<double>>::iterator pointiter = quadpoints.begin();
+                
+                for(pointiter; pointiter < quadpoints.end(); pointiter++)
+                {
+                    vector<double> point = *pointiter;
+                    double noiseValue = point[1];
+
+                    // Tracks which colors are included in this quad
+                    
+                    
+                    if (noiseValue < -0.3) {
+                        // Set point to blue
+                        glColor3f(0, 0, 1);
+                    } else if (noiseValue < 0) {
+                        // Set point to green
+                        glColor3f(0, 1, 0);
+                    } else if (noiseValue < 0.3) {
+                        // Color point brown
+                        glColor3f(0.6, 0.3, 0);
+                    } else {
+                        // Color point white
+                        glColor3f(1, 1, 1);
+                    }
+
+                    glVertex3f(point[0], point[1], point[2]);    
                 }
             }
         }
