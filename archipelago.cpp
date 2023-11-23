@@ -51,7 +51,7 @@ double asp=1;     // Aspect ratio
 int    zh=0;      // Light azimuth
 float  Ylight=2;  // Elevation of light
 int    light = 0;     // Light mode: true=draw polygon, false=draw shadow volume
-
+double scale = 1.4; // The scale by which to amplify terrain height
 
 // Global Variables (declared in archlib.c)
 int mode = 0;
@@ -61,8 +61,8 @@ Point Nc,Ec;
 float Lpos[4];
 
 // Perlin Variables
-int vectorNumber = 3;
-int pointDensity = 10;
+int vectorNumber = 10;
+int pointDensity = 25;
 int octaves = 4;
 vector<vector<double>> noise;
 
@@ -108,21 +108,28 @@ static void Light(int on)
  */
 void Scene(int Light)
 {
-   // SEGFAULT SOMEWHERE IN SCENE
-   int k;  // Counters used to draw floor
- 
    //  Set global light switch (used in DrawPolyShadow)
    light = Light;
-
-   //  Texture (pi.bmp)
-   glBindTexture(GL_TEXTURE_2D,tex2d[2]);
-   //  Enable textures if not drawing shadow volumes
-   if (light) glEnable(GL_TEXTURE_2D);
 
    // Draw Perlin Elevation
    if (mode == 0)  {TerrainQuads(vectorNumber, pointDensity, noise);}
    else if (mode == 1) {TerrainDots(vectorNumber, pointDensity, noise);}
    else if (mode == 2) {TerrainLines(vectorNumber, pointDensity, noise);}
+   
+   // Draw the Ocean
+   double xmin = 0 - (vectorNumber - (0.5)) / 2;
+   double zmin = 0 - (vectorNumber - (0.5)) / 2;
+   double xmax = -xmin;
+   double zmax = -zmin;
+
+   glBegin(GL_QUADS);
+      glColor3f(0.023f,0.258f,0.449f);
+      double ylevel = -0.1;
+      glVertex3f(xmin,ylevel, zmin);
+      glVertex3f(xmax,ylevel,zmin);
+      glVertex3f(xmax,ylevel,zmax);
+      glVertex3f(xmin,ylevel,zmax);
+   glEnd();
 
    //  Disable textures
    if (light) glDisable(GL_TEXTURE_2D);
@@ -134,15 +141,7 @@ void Scene(int Light)
    glEnable(GL_TEXTURE_2D);
    Color(1,1,1);
 
-   //  Water texture for floor and ceiling
-   glBindTexture(GL_TEXTURE_2D,tex2d[0]);
-   for (k=-1;k<=box;k+=2)
-      // Wall(0,0,0, 0,90*k , 8,8,box?6:2 , 4);
-
-   //  Crate texture for walls
-   glBindTexture(GL_TEXTURE_2D,tex2d[1]);
-   for (k=0;k<4*box;k++)
-      // Wall(0,0,0, 90*k,0 , 8,box?6:2,8 , 1);
+   // Create Textures here
 
    //  Disable textures
    glDisable(GL_TEXTURE_2D);

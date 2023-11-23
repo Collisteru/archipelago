@@ -66,6 +66,10 @@ vector<double> generate_gradient() {
 
 vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves) {
 
+
+    // TODO: Implement this as a user-facing parameter
+    double scale = 1;
+
     // Initialize point array
 
     int pointNumber = (vectorNumber - 1) * pointDensity;
@@ -80,7 +84,7 @@ vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves)
 
     for (int octave = 0; octave < octaves; ++octave) {
 
-        printf("Octave %d... \n", octave);
+        // printf("Octave %d... \n", octave);
         
         double frequency = pow(2, octave);
         double amplitude = pow(0.5, octave);
@@ -176,6 +180,10 @@ vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves)
                 // printf("Weighted elevation summands for point (%d, %d): weighted_bl: %f, weighted_ul: %f, weighted_ur: %f, weighted_br: %f \n", i, j, weighted_bl, weighted_ul, weighted_ur, weighted_br);
 
                 noise[i][j] += amplitude * ( weighted_bl + weighted_ul + weighted_ur + weighted_br);
+
+
+                // Finally, apply scale
+                noise[i][j] *= scale;
 
 
                 // printf("For point (%d, %d), the distances from the nearby gradients nodes are (clockwise, starting from the top right): \\
@@ -331,7 +339,6 @@ void TerrainDots(int vectorNumber, int pointDensity, vector<vector<double>> nois
     glEnd();
 }
 
-
 void TerrainLines(int vectorNumber, int pointDensity, vector<vector<double>> noise) {
      // int a = 10;
 
@@ -403,7 +410,6 @@ void TerrainLines(int vectorNumber, int pointDensity, vector<vector<double>> noi
     glEnd();
 }
 
-
 void TerrainQuads(int vectorNumber, int pointDensity, vector<vector<double>> noise) 
 {
     // int a = 10;
@@ -444,11 +450,7 @@ void TerrainQuads(int vectorNumber, int pointDensity, vector<vector<double>> noi
 
                     // Tracks which colors are included in this quad
                     
-                    
-                    if (noiseValue < -0.3) {
-                        // Set point to blue
-                        glColor3f(0, 0, 1);
-                    } else if (noiseValue < 0) {
+                    if (noiseValue < 0) {
                         // Set point to green
                         glColor3f(0, 1, 0);
                     } else if (noiseValue < 0.3) {
