@@ -85,10 +85,22 @@ vector<double> generate_gradient();
 vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves);
 void GenerateTerrain(int vectorNumber, int pointDensity, vector<vector<double>> noise, int mode);
 
-// Classes
-class Flyer;
+// Class Functions
 
 
+// Idea: Split the class off into its own separate headerfile
+class Flyer {       // The class
+  public:             
+    vector<double> position = {0,0,0};
+    vector<double> forward = {0,0,0};
+    vector<double> up = {0,0,0};
+    // Texture that this thing uses!
+
+    // Constructor
+    Flyer(vector<double> inputpos, vector<double> inputfor);
+
+    void draw();
+};
 
 // Global Variables Required by Files Outside archipelago.c
 extern Point  Lp;        // Light position in local coordinate system

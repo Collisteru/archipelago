@@ -159,7 +159,7 @@ void Scene(int Light)
 
    vector<double> eaglepos = {1, 3, 1};
    vector<double> eaglefor = {1, 0, 0};
-   Flyer eagle = Flyer(eaglepos, eaglefor);
+   Flyer eagle(eaglepos, eaglefor);
    eagle.draw();
 
    //  Disable textures
