@@ -83,10 +83,7 @@ void Color(float R,float G,float B);
 float smoothstep(int t);
 vector<double> generate_gradient();
 vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves);
-void TerrainTrigs(int vectorNumber, int pointDensity, vector<vector<double>> noise);
-void TerrainQuads(int vectorNumber, int pointDensity, vector<vector<double>> noise);
-void TerrainDots(int vectorNumber, int pointDensity, vector<vector<double>> noise);
-void TerrainLines(int vectorNumber, int pointDensity, vector<vector<double>> noise);
+void GenerateTerrain(int vectorNumber, int pointDensity, vector<vector<double>> noise, int mode);
 
 
 

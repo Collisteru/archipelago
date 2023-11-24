@@ -129,10 +129,6 @@ vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves)
                 vector<double> bottom_left = nodes[left_coord][bottom_coord];
                 vector<double> bottom_right = nodes[right_coord][bottom_coord];
 
-                // printf(" \n For point (%d, %d), the nodes are (clockwise, starting from the top right): \\
-                //   (%d, %d), (%d, %d), (%d, %d), (%d, %d). \n", i, j, (i/d)+1, (j/d)+1, (i/d)+1, j/d, i/d, j/d, i/d, (j/d)+1);
-
-
                 // Find the absolute value distance from each of the outer points.
 
                 float c = (float)1/(float)(d+1);
@@ -197,8 +193,8 @@ vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves)
     return noise;
 }
 
-void TerrainTrigs(int vectorNumber, int pointDensity, vector<vector<double>> noise) 
-{
+void GenerateTerrain(int vectorNumber, int pointDensity, vector<vector<double>> noise, int genMode) {
+   
     // int a = 10;
 
     double pointNumber = (vectorNumber - 1) * pointDensity;
@@ -210,225 +206,15 @@ void TerrainTrigs(int vectorNumber, int pointDensity, vector<vector<double>> noi
 
     std::iota(zrange.begin(), zrange.end(), 0);
 
-    for (int i = 0 ; i < size(xrange); i++) {
+    for (int i = 0 ; i < static_cast<int>(size(xrange)); i++) {
         xrange[i] = (xrange[i]  - (pointNumber) / 2)  / pointDensity;
         zrange[i] = (zrange[i]  - (pointNumber) / 2)  / pointDensity;
     }
 
-
-    glBegin(GL_TRIANGLES);
-        // Generate trig
-        for (int i = 0 ; i < (pointNumber - 1); i++) {
-            for (int j = 0 ; j < (pointNumber - 1); j++) {
-
-                vector<double> bl = {zrange[i], noise[i][j], xrange[j]};
-                vector<double> tl = {zrange[i], noise[i][j+1], xrange[j+1]};
-                vector<double> tr = {zrange[i+1], noise[i+1][j+1], xrange[j+1]};
-                vector<double> br = {zrange[i+1], noise[i+1][j], xrange[j]};
-
-                vector<vector<double>> draw_order;
-
-                // Even Quartet
-                if ((i + j) % 2 == 0) {
-                    draw_order = {bl, tl, tr, tr, br, bl};
-                } 
-                // Odd Quartet
-                else {
-                    draw_order = {br, bl, tl, tl, tr, br};
-                }
-
-                //decleration of vector iterator
-                vector<vector<double>>::iterator pointiter = draw_order.begin();
-                
-                for(pointiter; pointiter < draw_order.end(); pointiter++)
-                {
-                    vector<double> point = *pointiter;
-                    double noiseValue = point[2];
-                    
-                    if (noiseValue < -0.3) {
-                        // Set point to blue
-                        glColor3f(0.0f, 0.0f, 1.0f);
-                    } else if (noiseValue < 0) {
-                        // Set point to green
-                        glColor3f(0.0f, 1.0f, 0.0f);
-                    } else if (noiseValue < 0.3) {
-                        // Color point brown
-                        glColor3f(0.6f, 0.3f, 0.0f);
-                    } else if (noiseValue < 0.8) {
-                        // Color point white
-                        glColor3f(1.0f, 1.0f, 1.0f);
-                    }
-                    glVertex3f(point[0], point[1], point[2]);
-                    // access value in the memory to which the pointer
-                    // is referencing
-                }
-            }
-        }
-        glColor3f(1.0f, 1.0f, 1.0f);
-    glEnd();
-}
-
-void TerrainDots(int vectorNumber, int pointDensity, vector<vector<double>> noise) {
-     // int a = 10;
-
-    double pointNumber = (vectorNumber - 1) * pointDensity;
-
-    vector<double> xrange(pointNumber);
-    vector<double> zrange(pointNumber);
-
-    std::iota(xrange.begin(), xrange.end(), 0);
-
-    std::iota(zrange.begin(), zrange.end(), 0);
-
-    for (int i = 0 ; i < size(xrange); i++) {
-        xrange[i] = (xrange[i]  - (pointNumber) / 2)  / pointDensity;
-        zrange[i] = (zrange[i]  - (pointNumber) / 2)  / pointDensity;
-    }
-
-    glBegin(GL_POINTS);
-        // Generate points
-        for (int i = 0 ; i < (pointNumber - 1); i++) {
-            for (int j = 0 ; j < (pointNumber - 1); j++) {
-
-                vector<double> bl = {zrange[i], noise[i][j], xrange[j]};
-                vector<double> tl = {zrange[i], noise[i][j+1], xrange[j+1]};
-                vector<double> tr = {zrange[i+1], noise[i+1][j+1], xrange[j+1]};
-                vector<double> br = {zrange[i+1], noise[i+1][j], xrange[j]};
-
-                vector<vector<double>> quadpoints = {bl, tl, tr, br};
-
-                //decleration of vector iterator
-                vector<vector<double>>::iterator pointiter = quadpoints.begin();
-                
-                double a = 0;
-                double b = 0;
-                double c = 0;
-                double d = 0;
-
-                for(pointiter; pointiter < quadpoints.end(); pointiter++)
-                {
-                    vector<double> point = *pointiter;
-                    double noiseValue = point[1];
-
-                    // Tracks which colors are included in this quad
-                    
-                    
-                    if (noiseValue < -0.3) {
-                        // Set point to blue
-                        glColor3f(0.0f, 0.0f, 1.0f);
-                    } else if (noiseValue < 0) {
-                        // Set point to green
-                        glColor3f(0.0f, 1.0f, 0.0f);
-                    } else if (noiseValue < 0.3) {
-                        // Color point brown
-                        glColor3f(0.6f, 0.3f, 0.0f);
-                    } else if (noiseValue < 0.8) {
-                        // Color point white
-                        glColor3f(1.0f, 1.0f, 1.0f);
-                    }
-                    glVertex3f(point[0], point[1], point[2]);            
-
-                    // printf("%f", colors[0]);
-                    // printf("%f", color_list_sum);
-
-                    // access value in the memory to which the pointer
-                    // is referencing
-                }
-            }
-        }
-    glEnd();
-}
-
-void TerrainLines(int vectorNumber, int pointDensity, vector<vector<double>> noise) {
-     // int a = 10;
-
-    double pointNumber = (vectorNumber - 1) * pointDensity;
-
-    vector<double> xrange(pointNumber);
-    vector<double> zrange(pointNumber);
-
-    std::iota(xrange.begin(), xrange.end(), 0);
-
-    std::iota(zrange.begin(), zrange.end(), 0);
-
-    for (int i = 0 ; i < size(xrange); i++) {
-        xrange[i] = (xrange[i]  - (pointNumber) / 2)  / pointDensity;
-        zrange[i] = (zrange[i]  - (pointNumber) / 2)  / pointDensity;
-    }
-
-    glBegin(GL_LINES);
-        // Generate points
-        for (int i = 0 ; i < (pointNumber - 1); i++) {
-            for (int j = 0 ; j < (pointNumber - 1); j++) {
-
-                vector<double> bl = {zrange[i], noise[i][j], xrange[j]};
-                vector<double> tl = {zrange[i], noise[i][j+1], xrange[j+1]};
-                vector<double> tr = {zrange[i+1], noise[i+1][j+1], xrange[j+1]};
-                vector<double> br = {zrange[i+1], noise[i+1][j], xrange[j]};
-
-                vector<vector<double>> quadpoints = {bl, tl, tr, br};
-
-                //decleration of vector iterator
-                vector<vector<double>>::iterator pointiter = quadpoints.begin();
-                
-                double a = 0;
-                double b = 0;
-                double c = 0;
-                double d = 0;
-
-                for(pointiter; pointiter < quadpoints.end(); pointiter++)
-                {
-                    vector<double> point = *pointiter;
-                    double noiseValue = point[1];
-
-                    // Tracks which colors are included in this quad
-                    
-                    
-                    if (noiseValue < -0.3) {
-                        // Set point to blue
-                        glColor3f(0.0f, 0.0f, 1.0f);
-                    } else if (noiseValue < 0) {
-                        // Set point to green
-                        glColor3f(0.0f, 1.0f, 0.0f);
-                    } else if (noiseValue < 0.3) {
-                        // Color point brown
-                        glColor3f(0.6f, 0.3f, 0.0f);
-                    } else if (noiseValue < 0.8) {
-                        // Color point white
-                        glColor3f(1.0f, 1.0f, 1.0f);
-                    }
-                    glVertex3f(point[0], point[1], point[2]);            
-
-                    // printf("%f", colors[0]);
-                    // printf("%f", color_list_sum);
-
-                    // access value in the memory to which the pointer
-                    // is referencing
-                }
-            }
-        }
-    glEnd();
-}
-
-void TerrainQuads(int vectorNumber, int pointDensity, vector<vector<double>> noise) 
-{
-    // int a = 10;
-
-    double pointNumber = (vectorNumber - 1) * pointDensity;
-
-    vector<double> xrange(pointNumber);
-    vector<double> zrange(pointNumber);
-
-    std::iota(xrange.begin(), xrange.end(), 0);
-
-    std::iota(zrange.begin(), zrange.end(), 0);
-
-    for (int i = 0 ; i < size(xrange); i++) {
-        xrange[i] = (xrange[i]  - (pointNumber) / 2)  / pointDensity;
-        zrange[i] = (zrange[i]  - (pointNumber) / 2)  / pointDensity;
-    }
-
-    glBegin(GL_QUADS);
+    if (genMode == 0) {glBegin(GL_QUADS);}
+    else if (genMode == 1) {glBegin(GL_POINTS);}
+    else if (genMode == 2) {glBegin(GL_LINES);}
+    else {glBegin(GL_QUADS);}
         // Generate quad
         for (int i = 0 ; i < (pointNumber - 1); i++) {
             for (int j = 0 ; j < (pointNumber - 1); j++) {
@@ -441,19 +227,19 @@ void TerrainQuads(int vectorNumber, int pointDensity, vector<vector<double>> noi
                 vector<vector<double>> quadpoints = {bl, tl, tr, br};
 
                 //decleration of vector iterator
-                vector<vector<double>>::iterator pointiter = quadpoints.begin();
+                vector<vector<double>>::iterator pointiter;
                 
-                for(pointiter; pointiter < quadpoints.end(); pointiter++)
+                for(pointiter = quadpoints.begin(); pointiter < quadpoints.end(); pointiter++)
                 {
                     vector<double> point = *pointiter;
                     double noiseValue = point[1];
 
                     // Tracks which colors are included in this quad
                     
-                    if (noiseValue < 0) {
+                    if (noiseValue < 0.2) {
                         // Set point to green
                         glColor3f(0, 1, 0);
-                    } else if (noiseValue < 0.3) {
+                    } else if (noiseValue < 0.5) {
                         // Color point brown
                         glColor3f(0.6, 0.3, 0);
                     } else {

@@ -112,9 +112,7 @@ void Scene(int Light)
    light = Light;
 
    // Draw Perlin Elevation
-   if (mode == 0)  {TerrainQuads(vectorNumber, pointDensity, noise);}
-   else if (mode == 1) {TerrainDots(vectorNumber, pointDensity, noise);}
-   else if (mode == 2) {TerrainLines(vectorNumber, pointDensity, noise);}
+   GenerateTerrain(vectorNumber, pointDensity, noise, mode);
    
    // Draw the Ocean
    double xmin = 0 - (vectorNumber - (0.5)) / 2;
@@ -124,7 +122,7 @@ void Scene(int Light)
 
    glBegin(GL_QUADS);
       glColor3f(0.023f,0.258f,0.449f);
-      double ylevel = -0.1;
+      double ylevel = 0.1;
       glVertex3f(xmin,ylevel, zmin);
       glVertex3f(xmax,ylevel,zmin);
       glVertex3f(xmax,ylevel,zmax);
@@ -379,7 +377,7 @@ int main(int argc,char* argv[])
    //  Initialize GLUT
    glutInit(&argc,argv);
 
-   printf("Beginning noise generation...");
+   // printf("Beginning noise generation...");
 
    // Generate Perlin Noise
    noise = Perlin2D(vectorNumber,pointDensity,octaves);
