@@ -66,6 +66,8 @@ vector<double> generate_gradient() {
 
 vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves) {
 
+    srand(time(NULL));
+
 
     // TODO: Implement this as a user-facing parameter
     double scale = 1;
@@ -280,7 +282,7 @@ void terrainPatch(vector<vector<vector<double>>> points, int numPoints)
 // Perlin Testing Suite:
 
 // int main() {
-//     srand(time(NULL));
+
 //     int vectorNumber = 3;
 //     int pointDensity = 20;
 //     int octaves = 1;
