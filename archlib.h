@@ -68,9 +68,6 @@ int  LoadOBJ(const char* file);
 
 // Shapes
 typedef struct {float x,y,z;} Point;
-void Cube(float x,float y,float z , float th,float ph , float D);
-void Cylinder(float x,float y,float z , float th,float ph , float R,float H);
-void Torus(float x,float y,float z , float th,float ph , float S,float r);
 
 // Drawing Functions
 void DrawPoly(Point P[],Point N[],Point T[],int n);
@@ -85,8 +82,7 @@ vector<double> generate_gradient();
 vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves);
 void GenerateTerrain(int vectorNumber, int pointDensity, vector<vector<double>> noise, int mode);
 
-// Class Functions
-
+// Classes
 
 // Idea: Split the class off into its own separate headerfile
 class Flyer {       // The class

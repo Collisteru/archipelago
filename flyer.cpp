@@ -1,17 +1,14 @@
 #include "archlib.h"
 #include <vector>
 
-#include<math>
 
 // Constructor
 Flyer::Flyer(vector<double> inputpos, vector<double> inputfor) {
     position = inputpos;
     forward = inputfor;
-    // Cross Product
-    up[0] = position[1] * inputfor[2] - position[2] * inputfor[1];
-    up[1] = -(position[0] * inputfor[2] - position[2] * inputfor[0]);
-    up[2] = position[0] * inputfor[1] - position[1] * inputfor[0];
-    norm = math.sqrt()
+    up[0] = 0;
+    up[1] = 1;
+    up[2] = 0;
 }
 
 

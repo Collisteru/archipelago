@@ -225,11 +225,6 @@ static void DrawScene()
  */
 void display()
 {
-   //  Viewer Position
-   // float Ex = -2*dim*Sin(th)*Cos(ph);
-   // float Ey = +2*dim        *Sin(ph);
-   // float Ez = +2*dim*Cos(th)*Cos(ph);
-
 
    // Direction of Line of Sight (Forward)
    // Conversion of spherical to rectangular coordinates where phi is the azimuth and theta is the altitude
