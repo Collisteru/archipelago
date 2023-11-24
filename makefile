@@ -46,12 +46,13 @@ transform.o: transform.cpp archlib.h
 perlin.o: perlin.cpp archlib.h
 
 # Dependencies -- Objects
+flyer.o: flyer.cpp transform.cpp color.cpp drawpoly.cpp archlib.h
 cube.o: cube.cpp transform.cpp color.cpp drawpoly.cpp archlib.h
 cylinder.o: cylinder.cpp transform.cpp color.cpp drawpoly.cpp archlib.h
 torus.o: torus.cpp transform.cpp color.cpp drawpoly.cpp archlib.h
 
 #  Create archive
-archlib.a:fatal.o errcheck.o print.o loadtexbmp.o loadobj.o projection.o cube.o cylinder.o torus.o color.o transform.o drawpoly.o perlin.o
+archlib.a:fatal.o errcheck.o print.o loadtexbmp.o loadobj.o projection.o cube.o cylinder.o torus.o color.o transform.o drawpoly.o perlin.o flyer.o
 	ar -rcs $@ $^
 
 # Compile rules

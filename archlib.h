@@ -85,6 +85,9 @@ vector<double> generate_gradient();
 vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves);
 void GenerateTerrain(int vectorNumber, int pointDensity, vector<vector<double>> noise, int mode);
 
+// Classes
+class Flyer;
+
 
 
 // Global Variables Required by Files Outside archipelago.c

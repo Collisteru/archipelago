@@ -155,6 +155,13 @@ void Scene(int Light)
       glVertex3f(xmin,ylevel,zmax);
    glEnd();
 
+   // Draw Fliers
+
+   vector<double> eaglepos = {1, 3, 1};
+   vector<double> eaglefor = {1, 0, 0};
+   Flyer eagle = Flyer(eaglepos, eaglefor);
+   eagle.draw();
+
    //  Disable textures
    if (light) glDisable(GL_TEXTURE_2D);
 
