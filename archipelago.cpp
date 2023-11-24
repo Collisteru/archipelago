@@ -33,43 +33,69 @@
 #include <bits/stdc++.h> 
 using namespace std; 
 
+// Player Movement
+double    th= -0.323;    // Azimuth of view angle
+double    ph= 0;    // Elevation of view angle
 
+/// Player Position
+vector<double> pos = {0, 2, 0};
+double mov = 0.1;
 
-// Local Variables
-int    obj=15;    // Display objects (bitmap)
-int    moveFlag=1;    // Light movement
-int    axes=1;    // Display axes
-int    box=0;     // Display enclosing box
-int    th=-30;    // Azimuth of view angle
-int    ph=+30;    // Elevation of view angle
-int    inf=1;     // Infinity
-int    tex2d[3];  // Textures (names)
-int    size=0;    // Lid stretch
-int    depth=0;   // Stencil depth
-double asp=1;     // Aspect ratio
+/// Up
+vector<double> sursum = {0,1,0};
 
+/// Down
+vector<double> deorsum = {0,-1,0};
+
+/// Player View Direction
+vector<double> punctum = {1, 1, 1}; // The point that the player is viewing
+
+// Forward
+vector<double> pro = {-1, -1, -1};
+
+/// Player Movement Vectors
+vector<double> sinister(3); // Left
+vector<double> dexter(3); // Right
+vector<double> retrorsum(3); // Backwards
+
+// Light Settings
 int    zh=0;      // Light azimuth
 float  Ylight=2;  // Elevation of light
 int    light = 0;     // Light mode: true=draw polygon, false=draw shadow volume
-double scale = 1.4; // The scale by which to amplify terrain height
 
-// Global Variables (declared in archlib.c)
+
+// Display Settings
 int mode = 0;
 double dim=3; // Size of World
 Point Lp;
 Point Nc,Ec;
+int    moveFlag=1;    // Light movement
+int    axes=1;    // Display axes
 float Lpos[4];
 
-// Perlin Variables
+// Perlin Noise Terrain Variables
 int vectorNumber = 10;
 int pointDensity = 25;
 int octaves = 4;
+double scale = 1.4; // The scale by which to amplify terrain height
 vector<vector<double>> noise;
+
+// Other
+int    inf=1;     // Infinity
+double asp=1;     // Aspect ratio
 
 #define MAXN 64    // Maximum number of slices (n) and points in a polygon
 
 using namespace std;
 
+//function to calculate cross product of two vectors
+vector<double> cross_product(vector<double> vector_a, vector<double> vector_b) {
+   vector<double> output = {0,0,0};
+   output[0] = vector_a[1] * vector_b[2] - vector_a[2] * vector_b[1];
+   output[1] = -(vector_a[0] * vector_b[2] - vector_a[2] * vector_b[0]);
+   output[2] = vector_a[0] * vector_b[1] - vector_a[1] * vector_b[0];
+   return output;
+}
 
 /*
  *  Enable lighting
@@ -173,13 +199,13 @@ static void DrawScene()
    //  Make color mask and depth buffer read-write
    glColorMask(1,1,1,1);
    //  Update the color only where the stencil value is 0
-   //  Do not change the stencilE
+   //  Do not change the stencil
    glStencilFunc(GL_EQUAL,0,0xFFFFFFFF);
    glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
    //  Redraw only if depth matches front object
    glDepthFunc(GL_EQUAL);
 
-   //  Undo changes (no stencil test, draw if closer and update Z-buffer)
+   //  Undo changes (no stencil test, draw if closer and sursumdate Z-buffer)
    glDisable(GL_STENCIL_TEST);
    glDepthFunc(GL_LESS); 
    glDepthMask(1);
@@ -192,16 +218,35 @@ static void DrawScene()
  */
 void display()
 {
-   //  Eye position
-   float Ex = -2*dim*Sin(th)*Cos(ph);
-   float Ey = +2*dim        *Sin(ph);
-   float Ez = +2*dim*Cos(th)*Cos(ph);
+   //  Viewer Position
+   // float Ex = -2*dim*Sin(th)*Cos(ph);
+   // float Ey = +2*dim        *Sin(ph);
+   // float Ez = +2*dim*Cos(th)*Cos(ph);
 
-   //  Light position
-   Lpos[0] = 2*Cos(zh);
-   Lpos[1] = Ylight;
-   Lpos[2] = 2*Sin(zh);
-   Lpos[3] = 1;
+
+   // Direction of Line of Sight (Forward)
+   // Conversion of spherical to rectangular coordinates where phi is the azimuth and theta is the altitude
+   pro[0] = -0.01 + cos(th) * cos(ph);
+   pro[1] = -0.01  + sin(th);
+   pro[2] = -0.01 + cos(th) * sin(ph);
+
+   // Punctum is direction + position
+   punctum[0] = pos[0] + pro[0];
+   punctum[1] = pos[1] + pro[1];
+   punctum[2] = pos[2] + pro[2];
+
+   // retrorsum = -pro
+   retrorsum[0] = -pro[0];
+   retrorsum[1] = -pro[1];
+   retrorsum[2] = -pro[2];
+
+   // // Direction of Right (Cross Product of Forward and Up)
+   dexter = cross_product(pro, sursum);
+
+   // Left = -dexter
+   sinister[0] = -dexter[0];
+   sinister[1] = -dexter[1];
+   sinister[2] = -dexter[2];
 
    //  Erase the window and the depth and stencil buffers
    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
@@ -210,15 +255,7 @@ void display()
 
    //  Set perspective
    glLoadIdentity();
-   gluLookAt(Ex,Ey,Ez , 0,0,0 , 0,Cos(ph),0);
-
-   //  Draw light position as sphere (still no lighting here)
-   // Light sphere disabled for now
-   // glColor3f(1,1,1);
-   // glPushMatrix();
-   // glTranslated(Lpos[0],Lpos[1],Lpos[2]);
-   // glutSolidSphere(0.03,10,10);
-   // glPopMatrix();
+   gluLookAt(pos[0],pos[1],pos[2] , punctum[0],punctum[1], punctum[2] , 0,1,0);
 
 
    //  Draw the scene
@@ -280,19 +317,16 @@ void special(int key,int x,int y)
 {
    //  Right arrow key - increase angle by 5 degrees
    if (key == GLUT_KEY_RIGHT)
-      th += 1;
+      ph += 0.04;
    //  Left arrow key - decrease angle by 5 degrees
    else if (key == GLUT_KEY_LEFT)
-      th -= 1;
+      ph -= 0.04;
    //  Up arrow key - increase elevation by 5 degrees
    else if (key == GLUT_KEY_UP)
-      ph += 1;
+      th += 0.04;
    //  Down arrow key - decrease elevation by 5 degrees
    else if (key == GLUT_KEY_DOWN)
-      ph -= 1;
-   //  Keep angles to +/-360 degrees
-   th %= 360;
-   ph %= 360;
+      th -= 0.04;
    //  Update projection
    Project(60,asp,dim);
    //  Tell GLUT it is necessary to redisplay the scene
@@ -307,42 +341,51 @@ void key(unsigned char ch,int x,int y)
    //  Exit on ESC
    if (ch == 27)
       exit(0);
+   //  Move Forward
+   else if (ch == 'w') {
+      pos[0] = pos[0] + mov * pro[0];
+      pos[1] = pos[1] + mov * pro[1];
+      pos[2] = pos[2] + mov * pro[2];
+   }
+   // Move backward
+   else if (ch == 's') {
+      pos[0] = pos[0] + mov * retrorsum[0];
+      pos[1] = pos[1] + mov * retrorsum[1];
+      pos[2] = pos[2] + mov * retrorsum[2];
+   }
+   // Move left
+   else if (ch == 'a') {
+      pos[0] = pos[0] + mov * sinister[0];
+      pos[1] = pos[1] + mov * sinister[1];
+      pos[2] = pos[2] + mov * sinister[2];
+   }
+      // Move right
+   else if (ch == 'd') {
+      pos[0] = pos[0] + mov * dexter[0];
+      pos[1] = pos[1] + mov * dexter[1];
+      pos[2] = pos[2] + mov * dexter[2];
+   }
+   // Move up
+   else if (ch == 'u') {
+      pos[0] = pos[0] + mov * sursum[0];
+      pos[1] = pos[1] + mov * sursum[1];
+      pos[2] = pos[2] + mov * sursum[2];
+   }
+   // Move down
+   else if (ch == 'j') {
+      pos[0] = pos[0] + mov * deorsum[0];
+      pos[1] = pos[1] + mov * deorsum[1];
+      pos[2] = pos[2] + mov * deorsum[2];
+   }
    //  Reset view angle
    else if (ch == '0')
       th = ph = 0;
-   //  Toggle axes
-   else if (ch == 'a' || ch == 'A')
-      axes = 1-axes;
    //  Toggle display modes
    else if (ch == 'm')
       mode = (mode+1)%3;
    else if (ch == 'M')
       if (mode == 0) mode = 2;
       else mode = mode - 1;
-   //  Toggle light movement
-   else if (ch == 's' || ch == 'S')
-      moveFlag = 1-moveFlag;
-   //  Toggle box
-   else if (ch == 'b' || ch == 'B')
-      box = 1-box;
-   //  Toggle infinity calculation
-   else if (ch == 'i' || ch == 'I')
-      inf = 1-inf;
-   //  Toggle objects
-   else if (ch == 'o')
-      obj = (obj+1)%16;
-   else if (ch == 'O')
-      obj = (obj+15)%16;
-   //  Light elevation
-   else if (ch=='-')
-      Ylight -= 0.1;
-   else if (ch=='+')
-      Ylight += 0.1;
-   //  Light azimuth
-   else if (ch=='[')
-      zh -= 1;
-   else if (ch==']')
-      zh += 1;
    // Zoom
    else if (ch=='z')
       dim += 0.05;
@@ -370,7 +413,7 @@ void reshape(int width,int height)
 }
 
 /*
- *  Start up GLUT and tell it what to do
+ *  Start sursum GLUT and tell it what to do
  */
 int main(int argc,char* argv[])
 {
