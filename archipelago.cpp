@@ -28,7 +28,6 @@
 
 #include <vector>
 #include <numeric>
-#include <windows.h>
 
 #include <bits/stdc++.h> 
 using namespace std; 
