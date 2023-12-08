@@ -63,7 +63,7 @@ float  Ylight=2;  // Elevation of light
 int    light = 0;     // Light mode: true=draw polygon, false=draw shadow volume
 
 
-// Display Settings
+// Display Settings and Declarations of extern Variables
 int mode = 0;
 double dim=3; // Size of World
 Point Lp;
@@ -71,6 +71,7 @@ Point Nc,Ec;
 int    moveFlag=1;    // Light movement
 int    axes=1;    // Display axes
 float Lpos[4];
+unsigned int textures;
 
 // Perlin Noise Terrain Variables
 int vectorNumber = 10;
@@ -164,20 +165,6 @@ void Scene(int Light)
    Flyer eagle(eaglepos, eaglefor);
    eagle.draw();
 
-   //  Disable textures
-   if (light) glDisable(GL_TEXTURE_2D);
-
-   //  The floor, ceiling and walls don't cast a shadow, so bail here
-   if (!light) return;
-
-   //  Always enable textures
-   glEnable(GL_TEXTURE_2D);
-   Color(1,1,1);
-
-   // Create Textures here
-
-   //  Disable textures
-   glDisable(GL_TEXTURE_2D);
 }
 
 /*
@@ -185,6 +172,9 @@ void Scene(int Light)
  */
 static void DrawScene()
 {
+
+   // Generate textures
+   glGenTextures(6, &textures);
    
    //  Enable lighting
    //  Render the parts of objects not in shadows
@@ -423,8 +413,6 @@ int main(int argc,char* argv[])
 {
    //  Initialize GLUT
    glutInit(&argc,argv);
-
-   // printf("Beginning noise generation...");
 
    // Generate Perlin Noise
    noise = Perlin2D(vectorNumber,pointDensity,octaves);

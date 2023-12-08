@@ -85,7 +85,6 @@ void GenerateTerrain(int vectorNumber, int pointDensity, vector<vector<double>> 
 
 // Classes
 
-// Idea: Split the class off into its own separate headerfile
 class Flyer {       // The class
   public:             
     vector<double> position = {0,0,0};
@@ -99,13 +98,14 @@ class Flyer {       // The class
     void draw();
 };
 
-// Global Variables Required by Files Outside archipelago.c
+// Global Variables
 extern Point  Lp;        // Light position in local coordinate system
 extern Point  Nc,Ec;     // Far or near clipping plane in local coordinate system
 
 extern float  Lpos[4];   // Light position
 extern int    mode;    // Display mode
 extern double dim;     // Size of world
+extern unsigned int textures;
 
 
 

@@ -53,6 +53,9 @@ int Skybox(double dim) {
     // dim is distance of each face from the origin.
     // Each face has an area of (2*dim)^2
 
+    // Set Texture
+    glBindTexture(GL_TEXTURE_2D,'box_top.bmp');
+
     glColor3f(0.0f,0.0f,1.0f);
     Cube(0,0,0, 0,0, dim);
 
