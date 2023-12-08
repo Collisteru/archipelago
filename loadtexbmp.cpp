@@ -1,7 +1,11 @@
 //  CSCIx229 library
 //  Willem A. (Vlakkies) Schreuder
-#include "archlib.h"
 
+// Modified for C++ by Sean Carter
+#include "archlib.h"
+#include <string>
+
+using namespace std;
 //
 //  Load texture from BMP file
 //
@@ -23,10 +27,10 @@ static void Reverse(void* x,const int n)
 //
 //  Load texture from BMP file
 //
-unsigned int LoadTexBMP(const char* file)
+unsigned int LoadTexBMP(string file)
 {
    //  Open file
-   FILE* f = fopen(file,"rb");
+   FILE* f = fopen(file.c_str(),"rb");
    if (!f) Fatal("Cannot open file %s\n",file);
    //  Check image magic
    unsigned short magic;

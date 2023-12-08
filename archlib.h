@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <string>
 #include <math.h>
 #include <vector>
 
@@ -60,7 +61,7 @@ extern "C" {
 // Helper Functions
 void Print(const char* format , ...);
 void Fatal(const char* format , ...);
-unsigned int LoadTexBMP(const char* file);
+unsigned int LoadTexBMP(string file);
 void Project(double fov,double asp,double dim);
 void ErrCheck(const char* where);
 int  LoadOBJ(const char* file);
@@ -74,7 +75,7 @@ void DrawPoly(Point P[],Point N[],Point T[],int n);
 void Crout(double M[16],int I[4]);
 void Transform(float x0,float y0,float z0, float Sx,float Sy,float Sz, float th,float ph);
 void Color(float R,float G,float B);
-void Cube(float x,float y,float z , float th,float ph , float D);
+void Cube(float x,float y,float z , float th,float ph , float D, unsigned int texturemap[]);
 int Skybox(double dim);
 
 // Functions from perlin.c
@@ -105,7 +106,7 @@ extern Point  Nc,Ec;     // Far or near clipping plane in local coordinate syste
 extern float  Lpos[4];   // Light position
 extern int    mode;    // Display mode
 extern double dim;     // Size of world
-extern unsigned int textures;
+extern unsigned int textures[6];
 
 
 

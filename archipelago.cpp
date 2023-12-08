@@ -71,11 +71,11 @@ Point Nc,Ec;
 int    moveFlag=1;    // Light movement
 int    axes=1;    // Display axes
 float Lpos[4];
-unsigned int textures;
+unsigned int textures[6];
 
 // Perlin Noise Terrain Variables
-int vectorNumber = 10;
-int pointDensity = 25;
+int vectorNumber = 15;
+int pointDensity = 20;
 int octaves = 4;
 double scale = 1.4; // The scale by which to amplify terrain height
 vector<vector<double>> noise;
@@ -155,11 +155,27 @@ void Scene(int Light)
       glVertex3f(xmin,ylevel,zmax);
    glEnd();
 
+   // Texture test: Attempt to draw a triangle with a texture
+   unsigned int testtexture;
+   testtexture = LoadTexBMP("box_back.bmp");
+
+   glEnable(GL_TEXTURE_2D);
+   glTexEnvi(GL_TEXTURE_ENV , GL_TEXTURE_ENV_MODE , mode?GL_REPLACE:GL_MODULATE);
+   glBindTexture(GL_TEXTURE_2D,testtexture);
+   
+   // Draw a Triangle
+   glBegin(GL_TRIANGLES);
+   glTexCoord2f(0.0  ,0.0); glVertex2f( -1,0);
+   glTexCoord2f(1.0  ,0.0); glVertex2f( +1,0);
+   glTexCoord2f(1.0/2,1.0); glVertex2f( 0, 2.0);
+   glEnd();
+
+   glDisable(GL_TEXTURE_2D);
+
    // Draw the Skybox
    Skybox(xmax);
 
    // Draw Fliers
-
    vector<double> eaglepos = {1, 3, 1};
    vector<double> eaglefor = {1, 0, 0};
    Flyer eagle(eaglepos, eaglefor);
@@ -172,44 +188,15 @@ void Scene(int Light)
  */
 static void DrawScene()
 {
-
-   // Generate textures
-   glGenTextures(6, &textures);
    
    //  Enable lighting
    //  Render the parts of objects not in shadows
    //  (The mode test is for demonstrating unlit objects only)
    Light(0);
+
+   // Draw scene with lit colors
    Scene(1);
 
-   //  Make color buffer and Z buffer read-only
-   glColorMask(0,0,0,0);
-   glDepthMask(0);
-   //  Enable stencil
-   glEnable(GL_STENCIL_TEST);
-   //  Always draw regardless of the stencil value
-   glStencilFunc(GL_ALWAYS,0,0xFFFFFFFF);
-
-   //  Enable face culling
-   glEnable(GL_CULL_FACE);
-
-   //  Disable face culling
-   glDisable(GL_CULL_FACE);
-   //  Make color mask and depth buffer read-write
-   glColorMask(1,1,1,1);
-   //  Update the color only where the stencil value is 0
-   //  Do not change the stencil
-   glStencilFunc(GL_EQUAL,0,0xFFFFFFFF);
-   glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
-   //  Redraw only if depth matches front object
-   glDepthFunc(GL_EQUAL);
-
-   //  Undo changes (no stencil test, draw if closer and sursumdate Z-buffer)
-   glDisable(GL_STENCIL_TEST);
-   glDepthFunc(GL_LESS); 
-   glDepthMask(1);
-   //  Disable lighting
-   Light(0);
 }
 
 /*
@@ -250,7 +237,6 @@ void display()
    //  Set perspective
    glLoadIdentity();
    gluLookAt(pos[0],pos[1],pos[2] , punctum[0],punctum[1], punctum[2] , 0,1,0);
-
 
    //  Draw the scene
    DrawScene();
@@ -407,7 +393,7 @@ void reshape(int width,int height)
 }
 
 /*
- *  Start sursum GLUT and tell it what to do
+ *  Start up GLUT and tell it what to do
  */
 int main(int argc,char* argv[])
 {
@@ -436,6 +422,7 @@ int main(int argc,char* argv[])
    //  Pass control to GLUT so it can interact with the user
    ErrCheck("init");
 
+   // Enter Main Loop
    glutMainLoop();
    return 0;
 }
