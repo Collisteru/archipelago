@@ -125,25 +125,4 @@ void Transform(float x0,float y0,float z0,
    //  Apply M to existing transformations
    glMultMatrixd(M);
 
-   /*
-    *  Determine light position in this coordinate system
-    */
-   Crout(M,I);
-   Lp = Backsolve(M,I,Lpos[0],Lpos[1],Lpos[2],Lpos[3]);
-
-   /*
-    *  Determine clipping plane E & N
-    *  Use the entire MODELVIEW matrix here
-    */
-   glGetDoublev(GL_MODELVIEW_MATRIX,M);
-   //  Normal is down the Z axis (0,0,1) since +/- doesn't matter here
-   //  The normal matrix is the inverse of the transpose of M
-   Nc.x = M(2,0);
-   Nc.y = M(2,1);
-   Nc.z = M(2,2);
-   //  Far  clipping plane for Z-fail should be just less than 8*dim
-   //  Near clipping plane for Z-pass should be just more than dim/8
-   Crout(M,I);
-   Z = (mode==5) ? -7.9*dim : -0.13*dim;
-   Ec = Backsolve(M,I,0,0,Z,1);
 }

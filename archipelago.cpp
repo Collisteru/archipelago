@@ -154,6 +154,9 @@ void Scene(int Light)
       glVertex3f(xmin,ylevel,zmax);
    glEnd();
 
+   // Draw the Skybox
+   Skybox(xmax);
+
    // Draw Fliers
 
    vector<double> eaglepos = {1, 3, 1};

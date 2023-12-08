@@ -13,9 +13,6 @@
 #include <ranges>
 #include <list>
 
-
-
-
 using namespace std;
 
 namespace views = std::views;
@@ -59,8 +56,6 @@ vector<double> generate_gradient() {
 
     return gradient;
 }
-
-
 
 
 vector<vector<double>> Perlin2D(int vectorNumber, int pointDensity, int octaves) {

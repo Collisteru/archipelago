@@ -74,7 +74,8 @@ void DrawPoly(Point P[],Point N[],Point T[],int n);
 void Crout(double M[16],int I[4]);
 void Transform(float x0,float y0,float z0, float Sx,float Sy,float Sz, float th,float ph);
 void Color(float R,float G,float B);
-
+void Cube(float x,float y,float z , float th,float ph , float D);
+int Skybox(double dim);
 
 // Functions from perlin.c
 float smoothstep(int t);
