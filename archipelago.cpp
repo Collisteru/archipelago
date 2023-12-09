@@ -74,8 +74,8 @@ float Lpos[4];
 unsigned int textures[6];
 
 // Perlin Noise Terrain Variables
-int vectorNumber = 15;
-int pointDensity = 20;
+int vectorNumber = 17;
+int pointDensity = 15;
 int octaves = 4;
 double scale = 1.4; // The scale by which to amplify terrain height
 vector<vector<double>> noise;
@@ -147,30 +147,14 @@ void Scene(int Light)
    double zmax = -zmin;
 
    glBegin(GL_QUADS);
-      glColor3f(0.023f,0.258f,0.449f);
+      glColor3f((58./256),(132./256),(189/256.));
       double ylevel = 0.1;
       glVertex3f(xmin,ylevel, zmin);
       glVertex3f(xmax,ylevel,zmin);
       glVertex3f(xmax,ylevel,zmax);
       glVertex3f(xmin,ylevel,zmax);
+      glColor3f(1.0f,1.0f,1.0f); // Reset colors back
    glEnd();
-
-   // Texture test: Attempt to draw a triangle with a texture
-   // unsigned int testtexture;
-   // testtexture = LoadTexBMP("box_back.bmp");
-
-   // glEnable(GL_TEXTURE_2D);
-   // glTexEnvi(GL_TEXTURE_ENV , GL_TEXTURE_ENV_MODE , mode?GL_REPLACE:GL_MODULATE);
-   // glBindTexture(GL_TEXTURE_2D,testtexture);
-   
-   // Draw a Triangle
-   // glBegin(GL_TRIANGLES);
-   // glTexCoord2f(0.0  ,0.0); glVertex3f( -1,0, 0);
-   // glTexCoord2f(1.0  ,0.0); glVertex3f( +1,0, 0);
-   // glTexCoord2f(1.0/2,1.0); glVertex3f( 0, 2.0, 0);
-   // glEnd();
-
-   // glDisable(GL_TEXTURE_2D);
 
    // Draw the Skybox
    Skybox(xmax);

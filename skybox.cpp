@@ -18,9 +18,7 @@ void Cube(float x,float y,float z , float th,float ph , float D, unsigned int te
     Point P5[] = { {-1,+1,+1} , {+1,+1,+1} , {+1,+1,-1} , {-1,+1,-1} }; //  Top
     Point P6[] = { {-1,-1,-1} , {+1,-1,-1} , {+1,-1,+1} , {-1,-1,+1} }; //  Bottom
     
-    // Textures
-    Point T1[] = { {0,0} , {1,0} , {1,1} , {0,1} }; //  Front
-    
+
     // This causes a stack overflow error when not paired with glPopMatrix
     
     // This is hurting textures!
