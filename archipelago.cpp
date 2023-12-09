@@ -156,21 +156,21 @@ void Scene(int Light)
    glEnd();
 
    // Texture test: Attempt to draw a triangle with a texture
-   unsigned int testtexture;
-   testtexture = LoadTexBMP("box_back.bmp");
+   // unsigned int testtexture;
+   // testtexture = LoadTexBMP("box_back.bmp");
 
-   glEnable(GL_TEXTURE_2D);
-   glTexEnvi(GL_TEXTURE_ENV , GL_TEXTURE_ENV_MODE , mode?GL_REPLACE:GL_MODULATE);
-   glBindTexture(GL_TEXTURE_2D,testtexture);
+   // glEnable(GL_TEXTURE_2D);
+   // glTexEnvi(GL_TEXTURE_ENV , GL_TEXTURE_ENV_MODE , mode?GL_REPLACE:GL_MODULATE);
+   // glBindTexture(GL_TEXTURE_2D,testtexture);
    
    // Draw a Triangle
-   glBegin(GL_TRIANGLES);
-   glTexCoord2f(0.0  ,0.0); glVertex2f( -1,0);
-   glTexCoord2f(1.0  ,0.0); glVertex2f( +1,0);
-   glTexCoord2f(1.0/2,1.0); glVertex2f( 0, 2.0);
-   glEnd();
+   // glBegin(GL_TRIANGLES);
+   // glTexCoord2f(0.0  ,0.0); glVertex3f( -1,0, 0);
+   // glTexCoord2f(1.0  ,0.0); glVertex3f( +1,0, 0);
+   // glTexCoord2f(1.0/2,1.0); glVertex3f( 0, 2.0, 0);
+   // glEnd();
 
-   glDisable(GL_TEXTURE_2D);
+   // glDisable(GL_TEXTURE_2D);
 
    // Draw the Skybox
    Skybox(xmax);
