@@ -17,6 +17,8 @@ Flyer::Flyer(vector<double> inputpos, vector<double> inputfor) {
 Butterfly::Butterfly(double inputspeed, double inputturnspeed, vector<double> inputpos, vector<double> inputfor) : Flyer(inputpos, inputfor) {
     speed = inputspeed;
     turnspeed = inputturnspeed;
+
+    
 }
 
 void Flyer::draw()
@@ -30,6 +32,8 @@ void Butterfly::draw(double size)
 
     // Load and render texture
 
+    // extern unsigned int butterflytextures[14];
+
     vector<double> orient_right = cross_product(forward, up);
 
     Point top_left;
@@ -42,25 +46,35 @@ void Butterfly::draw(double size)
     top_right.y = size * (position[1] + forward[1] + orient_right[1]);
     top_right.z = size * (position[2] + forward[2] + orient_right[2]);
 
+    Point bottom_right;
+    bottom_right.x = size * (position[0] - forward[0] + orient_right[0]);
+    bottom_right.y = size * (position[1] - forward[1] + orient_right[1]);
+    bottom_right.z = size * (position[2] - forward[2] + orient_right[2]);
 
     Point bottom_left;
     bottom_left.x = size * (position[0] - forward[0] - orient_right[0]);
     bottom_left.y =size *  (position[1] - forward[1] - orient_right[1]);
     bottom_left.z = size * (position[2] - forward[2] - orient_right[2]);
 
-    Point bottom_right;
-    bottom_right.x = size * (position[0] - forward[0] + orient_right[0]);
-    bottom_right.y = size * (position[1] - forward[1] + orient_right[1]);
-    bottom_right.z = size * (position[2] - forward[2] + orient_right[2]);
+    
 
+    Point T[] = { {0,1} , {1,1} , {1,0} , {0,0} };
 
+    // butterflytextures[0] = LoadTexBMP("butter1.bmp");
 
-    glColor3f(1,0,0);
+    glEnable(GL_TEXTURE_2D);
+    glTexEnvi(GL_TEXTURE_ENV , GL_TEXTURE_ENV_MODE , mode?GL_REPLACE:GL_MODULATE);
+    glBindTexture(GL_TEXTURE_2D, LoadTexBMP("butter6.bmp"));
+
+    // Top Left, Top Right, Bottom Right, Bottom Left
+    glColor4f(1,1,1, 0);
     glBegin(GL_QUADS);
-        glVertex3f(top_left.x, top_left.y, top_left.z);
-        glVertex3f(top_right.x, top_right.y, top_right.z);
-        glVertex3f(bottom_right.x, bottom_right.y, bottom_right.z);
-        glVertex3f(bottom_left.x, bottom_left.y, bottom_left.z);
+        glTexCoord2f(T[0].x, T[0].y); glVertex3f(top_left.x, top_left.y, top_left.z);
+        glTexCoord2f(T[1].x, T[1].y); glVertex3f(top_right.x, top_right.y, top_right.z);
+        glTexCoord2f(T[2].x, T[2].y); glVertex3f(bottom_right.x, bottom_right.y, bottom_right.z);
+        glTexCoord2f(T[3].x, T[3].y); glVertex3f(bottom_left.x, bottom_left.y, bottom_left.z);
     glEnd();
-    glColor3f(1,1,1);
+
+    glDisable(GL_TEXTURE_2D);
+
 }
