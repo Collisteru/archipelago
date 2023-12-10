@@ -38,24 +38,26 @@ double    ph= 0;    // Elevation of view angle
 
 /// Player Position
 vector<double> pos = {0, 2, 0};
-double mov = 0.1;
+double slowmov = 0.05;
+double fastmov = 0.5;
+double turnspeed = 0.12;
 
 /// Up
-vector<double> sursum = {0,1,0};
+vector<double> upwards = {0,1,0};
 
 /// Down
-vector<double> deorsum = {0,-1,0};
+vector<double> downwards = {0,-1,0};
 
 /// Player View Direction
-vector<double> punctum = {1, 1, 1}; // The point that the player is viewing
+vector<double> viewdirection = {1, 1, 1}; // The point that the player is viewing
 
 // Forward
-vector<double> pro = {-1, -1, -1};
+vector<double> forwards = {-1, -1, -1};
 
 /// Player Movement Vectors
-vector<double> sinister(3); // Left
-vector<double> dexter(3); // Right
-vector<double> retrorsum(3); // Backwards
+vector<double> leftwards(3); // Left
+vector<double> rightwards(3); // Right
+vector<double> backwards(3); // Backwards
 
 // Light Settings
 int    zh=0;      // Light azimuth
@@ -88,14 +90,7 @@ double asp=1;     // Aspect ratio
 
 using namespace std;
 
-//function to calculate cross product of two vectors
-vector<double> cross_product(vector<double> vector_a, vector<double> vector_b) {
-   vector<double> output = {0,0,0};
-   output[0] = vector_a[1] * vector_b[2] - vector_a[2] * vector_b[1];
-   output[1] = -(vector_a[0] * vector_b[2] - vector_a[2] * vector_b[0]);
-   output[2] = vector_a[0] * vector_b[1] - vector_a[1] * vector_b[0];
-   return output;
-}
+
 
 /*
  *  Enable lighting
@@ -160,10 +155,12 @@ void Scene(int Light)
    Skybox(xmax);
 
    // Draw Fliers
-   vector<double> eaglepos = {1, 3, 1};
-   vector<double> eaglefor = {1, 0, 0};
-   Flyer eagle(eaglepos, eaglefor);
-   eagle.draw();
+
+   // First Butterfly
+   vector<double> butter1pos = {1, 2, 1};
+   vector<double> butter1for = {1, 1, 0};
+   Butterfly butter1(1, 1, butter1pos, butter1for);
+   butter1.draw(0.25);
 
 }
 
@@ -191,27 +188,27 @@ void display()
 
    // Direction of Line of Sight (Forward)
    // Conversion of spherical to rectangular coordinates where phi is the azimuth and theta is the altitude
-   pro[0] = -0.01 + cos(th) * cos(ph);
-   pro[1] = -0.01  + sin(th);
-   pro[2] = -0.01 + cos(th) * sin(ph);
+   forwards[0] = -0.01 + cos(th) * cos(ph);
+   forwards[1] = -0.01  + sin(th);
+   forwards[2] = -0.01 + cos(th) * sin(ph);
 
    // Punctum is direction + position
-   punctum[0] = pos[0] + pro[0];
-   punctum[1] = pos[1] + pro[1];
-   punctum[2] = pos[2] + pro[2];
+   viewdirection[0] = pos[0] + forwards[0];
+   viewdirection[1] = pos[1] + forwards[1];
+   viewdirection[2] = pos[2] + forwards[2];
 
-   // retrorsum = -pro
-   retrorsum[0] = -pro[0];
-   retrorsum[1] = -pro[1];
-   retrorsum[2] = -pro[2];
+   // backwards = -forwards
+   backwards[0] = -forwards[0];
+   backwards[1] = -forwards[1];
+   backwards[2] = -forwards[2];
 
    // // Direction of Right (Cross Product of Forward and Up)
-   dexter = cross_product(pro, sursum);
+   rightwards = cross_product(forwards, upwards);
 
-   // Left = -dexter
-   sinister[0] = -dexter[0];
-   sinister[1] = -dexter[1];
-   sinister[2] = -dexter[2];
+   // Left = -rightwards
+   leftwards[0] = -rightwards[0];
+   leftwards[1] = -rightwards[1];
+   leftwards[2] = -rightwards[2];
 
    //  Erase the window and the depth and stencil buffers
    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
@@ -220,10 +217,11 @@ void display()
 
    //  Set perspective
    glLoadIdentity();
-   gluLookAt(pos[0],pos[1],pos[2] , punctum[0],punctum[1], punctum[2] , 0,1,0);
+   gluLookAt(pos[0],pos[1],pos[2] , viewdirection[0],viewdirection[1], viewdirection[2] , 0,1,0);
 
    //  Draw the scene
    DrawScene();
+
 
    //  Draw axes (white)
    glColor3f(1,1,1);
@@ -281,17 +279,17 @@ void special(int key,int x,int y)
 {
    //  Right arrow key - increase angle by 5 degrees
    if (key == GLUT_KEY_RIGHT)
-      ph += 0.04;
+      ph += turnspeed;
    //  Left arrow key - decrease angle by 5 degrees
    else if (key == GLUT_KEY_LEFT)
-      ph -= 0.04;
+      ph -= turnspeed;
    //  Up arrow key - increase elevation by 5 degrees
    else if (key == GLUT_KEY_UP)
-      th += 0.04;
+      th += turnspeed;
    //  Down arrow key - decrease elevation by 5 degrees
    else if (key == GLUT_KEY_DOWN)
-      th -= 0.04;
-   //  Update projection
+      th -= turnspeed;
+   //  Update forwardsjection
    Project(60,asp,dim);
    //  Tell GLUT it is necessary to redisplay the scene
    glutPostRedisplay();
@@ -307,39 +305,69 @@ void key(unsigned char ch,int x,int y)
       exit(0);
    //  Move Forward
    else if (ch == 'w') {
-      pos[0] = pos[0] + mov * pro[0];
-      pos[1] = pos[1] + mov * pro[1];
-      pos[2] = pos[2] + mov * pro[2];
+      pos[0] = pos[0] + slowmov * forwards[0];
+      pos[1] = pos[1] + slowmov * forwards[1];
+      pos[2] = pos[2] + slowmov * forwards[2];
+   }
+   else if (ch == 'W') {
+      pos[0] = pos[0] + fastmov * forwards[0];
+      pos[1] = pos[1] + fastmov * forwards[1];
+      pos[2] = pos[2] + fastmov * forwards[2];
    }
    // Move backward
    else if (ch == 's') {
-      pos[0] = pos[0] + mov * retrorsum[0];
-      pos[1] = pos[1] + mov * retrorsum[1];
-      pos[2] = pos[2] + mov * retrorsum[2];
+      pos[0] = pos[0] + slowmov * backwards[0];
+      pos[1] = pos[1] + slowmov * backwards[1];
+      pos[2] = pos[2] + slowmov * backwards[2];
    }
-   // Move left
+   else if (ch == 'S') {
+      pos[0] = pos[0] + fastmov * backwards[0];
+      pos[1] = pos[1] + fastmov * backwards[1];
+      pos[2] = pos[2] + fastmov * backwards[2];
+   }
+   // Move leftwards
    else if (ch == 'a') {
-      pos[0] = pos[0] + mov * sinister[0];
-      pos[1] = pos[1] + mov * sinister[1];
-      pos[2] = pos[2] + mov * sinister[2];
+      pos[0] = pos[0] + slowmov * leftwards[0];
+      pos[1] = pos[1] + slowmov * leftwards[1];
+      pos[2] = pos[2] + slowmov * leftwards[2];
    }
-      // Move right
+   else if (ch == 'A') {
+      pos[0] = pos[0] + fastmov * leftwards[0];
+      pos[1] = pos[1] + fastmov * leftwards[1];
+      pos[2] = pos[2] + fastmov * leftwards[2];
+   }
+      // Move rightwards
    else if (ch == 'd') {
-      pos[0] = pos[0] + mov * dexter[0];
-      pos[1] = pos[1] + mov * dexter[1];
-      pos[2] = pos[2] + mov * dexter[2];
+      pos[0] = pos[0] + slowmov * rightwards[0];
+      pos[1] = pos[1] + slowmov * rightwards[1];
+      pos[2] = pos[2] + slowmov * rightwards[2];
+   }
+   else if (ch == 'D') {
+      pos[0] = pos[0] + fastmov * rightwards[0];
+      pos[1] = pos[1] + fastmov * rightwards[1];
+      pos[2] = pos[2] + fastmov * rightwards[2];
    }
    // Move up
    else if (ch == 'u') {
-      pos[0] = pos[0] + mov * sursum[0];
-      pos[1] = pos[1] + mov * sursum[1];
-      pos[2] = pos[2] + mov * sursum[2];
+      pos[0] = pos[0] + slowmov * upwards[0];
+      pos[1] = pos[1] + slowmov * upwards[1];
+      pos[2] = pos[2] + slowmov * upwards[2];
+   }
+   else if (ch == 'U') {
+      pos[0] = pos[0] + fastmov * upwards[0];
+      pos[1] = pos[1] + fastmov * upwards[1];
+      pos[2] = pos[2] + fastmov * upwards[2];
    }
    // Move down
    else if (ch == 'j') {
-      pos[0] = pos[0] + mov * deorsum[0];
-      pos[1] = pos[1] + mov * deorsum[1];
-      pos[2] = pos[2] + mov * deorsum[2];
+      pos[0] = pos[0] + slowmov * downwards[0];
+      pos[1] = pos[1] + slowmov * downwards[1];
+      pos[2] = pos[2] + slowmov * downwards[2];
+   }
+   else if (ch == 'J') {
+      pos[0] = pos[0] + fastmov * downwards[0];
+      pos[1] = pos[1] + fastmov * downwards[1];
+      pos[2] = pos[2] + fastmov * downwards[2];
    }
    //  Reset view angle
    else if (ch == '0')
@@ -357,7 +385,7 @@ void key(unsigned char ch,int x,int y)
       dim -= 0.05;
    //  Set idle function
    glutIdleFunc(moveFlag?idle:NULL);
-   //  Reproject
+   //  Reforwardsject
    Project(60,asp,dim);
    //  Tell GLUT it is necessary to redisplay the scene
    glutPostRedisplay();
@@ -372,7 +400,7 @@ void reshape(int width,int height)
    asp = (height>0) ? (double)width/height : 1;
    //  Set the viewport to the entire window
    glViewport(0,0, RES*width,RES*height);
-   //  Set projection
+   //  Set forwardsjection
    Project(60,asp,dim);
 }
 
