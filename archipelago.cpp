@@ -11,7 +11,6 @@
  *  s/S        Start/stop light movement
  *  <>         Decrease/increase number of slices in objects
  *  b/B        Toggle room box
- *  a          Toggle axes
  *  arrows     Change view angle
  *  PgDn/PgUp  Zoom in and out
  *  0          Reset view angle
@@ -78,7 +77,6 @@ double dim=3; // Size of World
 Point Lp;
 Point Nc,Ec;
 int    moveFlag=1;    // Light movement
-int    axes=1;    // Display axes
 float Lpos[4];
 unsigned int textures[6];
 
@@ -256,25 +254,6 @@ void display()
 
    //  Draw axes (white)
    glColor3f(1,1,1);
-   if (axes)
-   {
-      const double len=2.0; //  Length of axes
-      glBegin(GL_LINES);
-      glVertex3d(0.0,0.0,0.0);
-      glVertex3d(len,0.0,0.0);
-      glVertex3d(0.0,0.0,0.0);
-      glVertex3d(0.0,len,0.0);
-      glVertex3d(0.0,0.0,0.0);
-      glVertex3d(0.0,0.0,len);
-      glEnd();
-      //  Label axes
-      glRasterPos3d(len,0.0,0.0);
-      Print("X");
-      glRasterPos3d(0.0,len,0.0);
-      Print("Y");
-      glRasterPos3d(0.0,0.0,len);
-      Print("Z");
-   }
 
    //  Display parameters
    glWindowPos2i(5,5);
@@ -439,14 +418,17 @@ void reshape(int width,int height)
 int main(int argc,char* argv[])
 {
    //  Initialize GLUT
+
+   // Bad -display param issue below
    glutInit(&argc,argv);
+   // param issue above
 
    // Generate Perlin Noise
    noise = Perlin2D(vectorNumber,pointDensity,octaves);
 
    // Initialize the boids at random positions
    double boidbound = boundary / 2;
-   for (int i = 0; i < 30; ++i) {
+   for (int i = 0; i < 20; ++i) {
       double posX = (rand() % (int)(2 * boidbound)) - boidbound; // Range: -bound < x < bound
       double posY = (rand() % (int)(boundary - 1)) + 1; // Range: 1 < y < bound
       double posZ = (rand() % (int)(2 * boidbound)) - boidbound; // Range: -bound < z < bound

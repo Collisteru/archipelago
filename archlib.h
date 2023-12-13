@@ -117,6 +117,7 @@ class Butterfly : public Flyer
 struct Vector3D {
     double x, y, z;
     Vector3D(double _x, double _y, double _z) : x(_x), y(_y), z(_z) {}
+    void normalize();
 };
 class Boid {
 private:

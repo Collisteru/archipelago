@@ -17,6 +17,8 @@ Flyer::Flyer(vector<double> inputpos, vector<double> inputfor) {
 Butterfly::Butterfly(double inputspeed, double inputturnspeed, vector<double> inputpos, vector<double> inputfor) : Flyer(inputpos, inputfor) {
     speed = inputspeed;
     turnspeed = inputturnspeed;
+
+    
 }
 
 void Flyer::draw()

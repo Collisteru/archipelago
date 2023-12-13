@@ -4,11 +4,20 @@
 #include <vector>
 #include <cmath>
 
+// Implement normalize
+void Vector3D::normalize() {
+    double mag = (x * x + y * y + z * z);
+    x = x / mag;
+    y = y / mag;
+    z = z / mag;
+}
+
 
 // Boid Constructor
 Boid::Boid(double x, double y, double z) : position(x, y, z), velocity(0, 0, 0) {
     maxSpeed = 0.7;
 }
+
 
 // Getter methods
 Vector3D Boid::getPosition() const { return position; }
@@ -16,14 +25,17 @@ Vector3D Boid::getVelocity() const { return velocity; }
 
 // Draw this Boid
 void Boid::draw() {
-        glColor3f(0.502f, 0.502f, 0.502f);
-        glBegin(GL_TRIANGLES);
-            glVertex3f(position.x, position.y, position.z);
-            glVertex3f(position.x+0.5, position.y, position.z);
-            glVertex3f(position.x, position.y, position.z+0.5);
-        glEnd();
-        glColor3f(1.0f, 1.0f, 1.0f);
-    }
+
+    // Drawing the boid
+    glColor3f(0.502f, 0.502f, 0.502f);
+    glBegin(GL_TRIANGLES);
+        glVertex3f(position.x, position.y, position.z);
+        glVertex3f(position.x + 0.5, position.y, position.z);
+        glVertex3f(position.x, position.y, position.z + 0.5);
+    glEnd();
+
+    glColor3f(1.0f, 1.0f, 1.0f);
+}
 
 // Function to update the boid's position and velocity based on the Boids algorithm
 void Boid::update(const std::vector<Boid>& boids, double separationFactor, double alignmentFactor, double cohesionFactor, double centralityFactor, double boundary) {
@@ -41,7 +53,7 @@ void Boid::update(const std::vector<Boid>& boids, double separationFactor, doubl
                                     pow(position.z - other.getPosition().z, 2));
 
             // Separation: Move away from nearby boids
-            if (distance < 4.0) {
+            if (distance < 3.0) {
                 separation.x += (position.x - other.getPosition().x);
                 separation.y += (position.y - other.getPosition().y);
                 separation.z += (position.z - other.getPosition().z);

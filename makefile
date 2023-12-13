@@ -1,5 +1,5 @@
-# Example 38
-EXE=archipelago
+# Final Project: Archipelago
+EXE=final
 
 PATCH = patchtest
 
@@ -64,7 +64,7 @@ archlib.a:fatal.o errcheck.o print.o loadtexbmp.o loadobj.o projection.o color.o
 
 
 #  Link
-archipelago: archipelago.cpp archlib.a
+final: archipelago.cpp archlib.a
 	g++ $(CFLG) -o $@ $^  $(LIBS) -std=c++20
 
 
