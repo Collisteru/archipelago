@@ -34,8 +34,8 @@ endif
 archipelago.o: archipelago.cpp archlib.h
 patchtest.o: patch_terrain_test.cpp archlib.h
 
-
 # Dependencies -- Utility Functions
+helper.o: helper.cpp archlib.h
 fatal.o: fatal.cpp archlib.h
 errcheck.o: errcheck.cpp archlib.h
 print.o: print.cpp archlib.h
@@ -51,7 +51,7 @@ flyer.o: flyer.cpp transform.cpp color.cpp drawpoly.cpp archlib.h
 skybox.o: skybox.cpp transform.cpp color.cpp drawpoly.cpp archlib.h
 
 #  Create archive
-archlib.a:fatal.o errcheck.o print.o loadtexbmp.o loadobj.o projection.o color.o transform.o drawpoly.o perlin.o flyer.o skybox.o
+archlib.a:fatal.o errcheck.o print.o loadtexbmp.o loadobj.o projection.o color.o transform.o drawpoly.o perlin.o flyer.o skybox.o helper.o
 	ar -rcs $@ $^
 
 # Compile rules

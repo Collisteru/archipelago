@@ -65,7 +65,8 @@ unsigned int LoadTexBMP(string file);
 void Project(double fov,double asp,double dim);
 void ErrCheck(const char* where);
 int  LoadOBJ(const char* file);
-
+double getTime();
+vector<double> cross_product(vector<double> vector_a, vector<double> vector_b);
 
 // Shapes
 typedef struct {float x,y,z;} Point;
@@ -97,6 +98,19 @@ class Flyer {       // The class
     Flyer(vector<double> inputpos, vector<double> inputfor);
 
     void draw();
+};
+
+class Butterfly : public Flyer
+{
+  // Real Speed (?)
+  public:
+    double speed;
+    double turnspeed;
+  // Turning Speed (?)
+
+    Butterfly(double inputspeed, double inputturnspeed, vector<double> inputpos, vector<double> inputfor);
+
+    void draw(double size);
 };
 
 // Global Variables
