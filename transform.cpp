@@ -106,8 +106,6 @@ void Transform(float x0,float y0,float z0,
                float th,float ph)
 {
    double M[16]; // Transformation matrix
-   int    I[4];  // Pivot
-   double Z;     // Location of clip plane
 
    //  Save current matrix
    glPushMatrix();

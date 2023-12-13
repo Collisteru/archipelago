@@ -83,6 +83,7 @@ vector<vector<double>> noise;
 // Other
 int    inf=1;     // Infinity
 double asp=1;     // Aspect ratio
+double boundary = 0.9 * ((vectorNumber - (0.5)) / 2); // Player Movement Boundary (Can't move Outside Skybox)
 
 #define MAXN 64    // Maximum number of slices (n) and points in a polygon
 
@@ -160,10 +161,7 @@ void Scene(int Light)
    Skybox(xmax);
 
    // Draw Fliers
-   vector<double> eaglepos = {1, 3, 1};
-   vector<double> eaglefor = {1, 0, 0};
-   Flyer eagle(eaglepos, eaglefor);
-   eagle.draw();
+
 
 }
 
@@ -212,6 +210,30 @@ void display()
    sinister[0] = -dexter[0];
    sinister[1] = -dexter[1];
    sinister[2] = -dexter[2];
+
+
+   // Keep the Player from Moving Outside Boundaries
+    // Ensure x stays within boundaries
+    if (pos[0] < -boundary) {
+        pos[0] = -boundary;
+    } else if (pos[0] > boundary) {
+        pos[0] = boundary;
+    }
+
+    // Ensure y stays within boundaries
+    if (pos[1] < 0.5) {
+        pos[1] = 0.5;
+    } else if (pos[1] > boundary) {
+        pos[1] = boundary;
+    }
+
+    // Ensure z stays within boundaries
+    if (pos[2] < -boundary) {
+        pos[2] = -boundary;
+    } else if (pos[2] > boundary) {
+        pos[2] = boundary;
+    }
+
 
    //  Erase the window and the depth and stencil buffers
    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
