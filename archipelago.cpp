@@ -64,6 +64,13 @@ int    zh=0;      // Light azimuth
 float  Ylight=2;  // Elevation of light
 int    light = 0;     // Light mode: true=draw polygon, false=draw shadow volume
 
+// Parameters for the Boids algorithm
+const double separationFactor = 0.03;
+const double alignmentFactor = 0.005;
+const double cohesionFactor = 0.01;
+const double centralityFactor = 0.06;
+std::vector<Boid> boids;
+int boidframe = 0;
 
 // Display Settings and Declarations of extern Variables
 int mode = 0;
@@ -76,8 +83,8 @@ float Lpos[4];
 unsigned int textures[6];
 
 // Perlin Noise Terrain Variables
-int vectorNumber = 17;
-int pointDensity = 15;
+int vectorNumber = 23;
+int pointDensity = 13;
 int octaves = 4;
 double scale = 1.4; // The scale by which to amplify terrain height
 vector<vector<double>> noise;
@@ -155,13 +162,12 @@ void Scene(int Light)
    // Draw the Skybox
    Skybox(xmax);
 
-   // Draw Fliers
+   // Update the Position of the Boids and Draw them
+   for (auto& boid : boids) {
+      boid.update(boids, separationFactor, alignmentFactor, cohesionFactor, centralityFactor, boundary);
+      boid.draw();
+   }
 
-   // First Butterfly
-   vector<double> butter1pos = {1, 2, 1};
-   vector<double> butter1for = {1, 1, 0};
-   Butterfly butter1(1, 1, butter1pos, butter1for);
-   butter1.draw(0.25);
 
 }
 
@@ -274,9 +280,7 @@ void display()
    glWindowPos2i(5,5);
    glColor3f(1.0f, 1.0f, 0.0f);
    
-   Print("z to zoom out. x to zoom in. \n");
-
-   glColor3f(1.0f, 1.0f, 1.0f);
+   // Print("Display text \n");
 
 
    //  Render the scene and make it visible
@@ -439,6 +443,16 @@ int main(int argc,char* argv[])
 
    // Generate Perlin Noise
    noise = Perlin2D(vectorNumber,pointDensity,octaves);
+
+   // Initialize the boids at random positions
+   double boidbound = boundary / 2;
+   for (int i = 0; i < 30; ++i) {
+      double posX = (rand() % (int)(2 * boidbound)) - boidbound; // Range: -bound < x < bound
+      double posY = (rand() % (int)(boundary - 1)) + 1; // Range: 1 < y < bound
+      double posZ = (rand() % (int)(2 * boidbound)) - boidbound; // Range: -bound < z < bound
+
+      boids.emplace_back(Boid(posX, posY, posZ));
+   }
 
    //  Request double buffered, true color window with Z buffering & stencil at 600x600
    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE | GLUT_STENCIL);

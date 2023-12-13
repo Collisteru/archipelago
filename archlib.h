@@ -113,6 +113,25 @@ class Butterfly : public Flyer
     void draw(double size);
 };
 
+// Boid class
+struct Vector3D {
+    double x, y, z;
+    Vector3D(double _x, double _y, double _z) : x(_x), y(_y), z(_z) {}
+};
+class Boid {
+private:
+    Vector3D position;
+    Vector3D velocity;
+    double maxSpeed;
+
+public:
+    Boid(double x, double y, double z);
+    Vector3D getPosition() const;
+    Vector3D getVelocity() const;
+    void update(const std::vector<Boid>& boids, double separationFactor, double alignmentFactor, double cohesionFactor, double centralityFactor, double boundary);
+    void draw();
+};
+
 // Global Variables
 extern Point  Lp;        // Light position in local coordinate system
 extern Point  Nc,Ec;     // Far or near clipping plane in local coordinate system

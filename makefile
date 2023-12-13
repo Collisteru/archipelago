@@ -48,10 +48,12 @@ perlin.o: perlin.cpp archlib.h
 # Dependencies -- Objects
 flyer.o: flyer.cpp transform.cpp color.cpp drawpoly.cpp archlib.h
 
+boids.o: flyer.cpp transform.cpp color.cpp drawpoly.cpp archlib.h
+
 skybox.o: skybox.cpp transform.cpp color.cpp drawpoly.cpp archlib.h
 
 #  Create archive
-archlib.a:fatal.o errcheck.o print.o loadtexbmp.o loadobj.o projection.o color.o transform.o drawpoly.o perlin.o flyer.o skybox.o helper.o
+archlib.a:fatal.o errcheck.o print.o loadtexbmp.o loadobj.o projection.o color.o transform.o drawpoly.o perlin.o flyer.o skybox.o helper.o boids.o
 	ar -rcs $@ $^
 
 # Compile rules
